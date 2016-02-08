@@ -4,14 +4,6 @@ import getopt
 import threading
 import subprocess
 
-# global LISTEN
-# global COMMAND
-# global UPLOAD_DESTINATION
-# global UPLOAD
-# global EXECUTE
-# global TARGET
-# global PORT
-
 class mnetkit():
     LISTEN = False
     COMMAND = False
@@ -42,18 +34,18 @@ class mnetkit():
             self.startListening()
 
     def captureCommandAndSend(self):
-        buffer = input("Enter command: ")
+        buffer = input("mnetkit>")
         self.send(str(buffer))
         print("Command captured: " + buffer)
 
     def send(self, buffer):
         remoteAddress = self.TARGET, int(self.PORT)
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(remoteAddress)
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientSocket.connect(remoteAddress)
 
         if (buffer.__len__() > 0):
-            client.send(buffer.encode("utf8"))
-            self.receiveResponse(client)
+            clientSocket.send(buffer.encode("utf8"))
+            self.receiveResponse(clientSocket)
 
     def startListening(self):
         if not (self.TARGET):
@@ -79,40 +71,42 @@ class mnetkit():
         return output
 
     def handleClientRequest(self, clientSocket):
-
         response = ""
-        data = clientSocket.recv(1024)
-        while data:
-            response += data.decode("utf8")
-            if not data: break
+        while True:
+            data = clientSocket.recv(1024)
+            if data:
+                response += data.decode("utf8")
+                print("Received command: " + response)
 
-        # upload a file (client -> target) to a specified upload destination
-        # if len(self.UPLOAD_DESTINATION):
-        #     fileBuffer = ""
-        #
-        #     while True:
-        #         data = clientSocket.recv(1024)
-        #         if not data:
-        #             break
-        #         else:
-        #             fileBuffer += data
-        #
-        #     try:
-        #         file = open(self.UPLOAD_DESTINATION, "wb")
-        #         file.write(fileBuffer)
-        #         file.close()
-        #         clientSocket.send(b'File uploaded successfully')
-        #     except:
-        #         print("Failed to upload file..")
+        if len(self.UPLOAD_DESTINATION):
+            file = open(self.UPLOAD_DESTINATION, "r")
+            fileContent = file.read()
+            print("File content: " + fileContent)
+            fileBuffer = ""
+            clientSocket.send(fileContent.encode("utf8"))
+
+            while True:
+                data = clientSocket.recv(1024)
+                if not data: break
+                else:
+                    fileBuffer += data.decode("utf8")
+            try:
+                # file = open(self.UPLOAD_DESTINATION, "wb")
+                file = open('~/Desktop/mnnekit2.py', "wb")
+                file.write(fileBuffer)
+                file.close()
+                clientSocket.send(b'File uploaded successfully')
+            except:
+                print("Failed to upload file..")
 
     def receiveResponse(self, client):
-        data = client.recv(4096)
         response = ""
+        data = client.recv(4096)
 
-        while client.recv(4096) != "":
+        while data:
             response += data.decode("utf8")
             print("Response: " + response)
-            # self.captureCommandAndSend()
+            self.captureCommandAndSend()
 
     def initialiseSwitches(self, options):
         for (option, argument) in options:
@@ -124,6 +118,7 @@ class mnetkit():
                 self.EXECUTE = argument
             if option in ("-u"):
                 self.UPLOAD_DESTINATION = argument
+                print("Got file to upload: " + self.UPLOAD_DESTINATION)
             if option in ("-t"):
                 self.TARGET = argument
             if option in ("-p"):
