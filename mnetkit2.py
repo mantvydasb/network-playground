@@ -79,6 +79,7 @@ class mnetkit():
         if (command.__len__() > 0):
             self.clientSocket.send(command.encode("utf8"))
             self.receiveResponse(self.clientSocket)
+            self.sendCommand()
 
     def startListening(self):
         print ("Listening on " + self.HOST + ":" + str(self.PORT))
@@ -109,35 +110,14 @@ class mnetkit():
                 response += data.decode("utf8")
                 print("Received command: " + response)
 
-        # if len(self.UPLOAD_DESTINATION):
-        #     file = open(self.UPLOAD_DESTINATION, "r")
-        #     fileContent = file.read()
-        #     print("File content: " + fileContent)
-        #     fileBuffer = ""
-        #     clientSocket.send(fileContent.encode("utf8"))
-        #
-        #     while True:
-        #         data = clientSocket.recv(1024)
-        #         if not data: break
-        #         else:
-        #             fileBuffer += data.decode("utf8")
-        #     try:
-        #         # file = open(self.UPLOAD_DESTINATION, "wb")
-        #         file = open('~/Desktop/mnnekit2.py', "wb")
-        #         file.write(fileBuffer)
-        #         file.close()
-        #         clientSocket.send(b'File uploaded successfully')
-        #     except:
-        #         print("Failed to upload file..")
-
     def receiveResponse(self, client):
         response = ""
-        data = client.recv(4096)
 
-        while data:
-            response += data.decode("utf8")
-            print("Response: " + response)
-            self.captureCommand()
-
+        while True:
+            data = client.recv(4096)
+            if data:
+                response += data.decode("utf8")
+                print("Response: " + response)
+            self.sendCommand()
 
 kit = mnetkit()
