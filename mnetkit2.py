@@ -98,9 +98,8 @@ class mnetkit():
         try:
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
         except:
-            output = "Failed to execute command!"
-            output.encode("utf8")
-        return output
+            output = "Failed to execute command!".encode("utf8")
+        return "Command did not return any data".encode("utf8") if not output else output
 
     def handleClientRequest(self, clientSocket):
         response = ""
@@ -108,7 +107,7 @@ class mnetkit():
             data = clientSocket.recv(1024).decode("utf8")
             if data:
                 response += data
-                print("Executing command: " + data)
+                print("Executing: " + data)
                 clientSocket.send(self.executeCommand(data))
             else:
                 response = ""
@@ -124,7 +123,7 @@ class mnetkit():
                 receivedDataLength = len(receivedData)
                 response += receivedData
                 if receivedDataLength < blockSize: break
-            print("Response: \n" + response)
+            print("\n" + response)
             self.sendCommand()
 
 
