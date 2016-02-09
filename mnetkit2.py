@@ -58,8 +58,8 @@ class mnetkit():
         else:
             try:
                 options, arguments = getopt.getopt(arguments, "hle:t:p:c:u:")
-                print("Options: " + str(options) + "\n")
-                print("Arguments: " + str(arguments) + "\n")
+                # print("Options: " + str(options) + "\n")
+                # print("Arguments: " + str(arguments) + "\n")
                 return options, arguments
             except getopt.GetoptError as error:
                 print(str(error))
@@ -125,7 +125,6 @@ class mnetkit():
                 if receivedDataLength < blockSize: break
             print("\n" + response)
             self.sendCommand()
-
 
 kit = mnetkit()
 
