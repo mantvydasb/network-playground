@@ -78,8 +78,8 @@ class mnetkit():
         command = self.captureCommand()
         if (command.__len__() > 0):
             self.clientSocket.send(command.encode("utf8"))
-            self.receiveResponse(self.clientSocket)
             self.sendCommand()
+            self.receiveResponse(self.clientSocket)
 
     def startListening(self):
         print ("Listening on " + self.HOST + ":" + str(self.PORT))
@@ -118,6 +118,5 @@ class mnetkit():
             if data:
                 response += data.decode("utf8")
                 print("Response: " + response)
-            self.sendCommand()
 
 kit = mnetkit()
