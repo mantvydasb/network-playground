@@ -95,22 +95,21 @@ class mnetkit():
 
     def executeCommand(self, command):
         command = command.rstrip()
-        try:
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-        except:
-            output = "Failed to execute command!".encode("utf8")
-        return "Command did not return any data".encode("utf8") if not output else output
+
+        if "download" in command:
+            print("Seems like we will be downloading stuff")
+        else:
+            try:
+                output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+            except:
+                output = "Failed to execute command!".encode("utf8")
+            return "Command did not return any data".encode("utf8") if not output else output
 
     def handleClientRequest(self, clientSocket):
-        response = ""
         while True:
             data = clientSocket.recv(1024).decode("utf8")
-            if data:
-                response += data
-                print("Executing: " + data)
-                clientSocket.send(self.executeCommand(data))
-            else:
-                response = ""
+            print("Executing: " + data)
+            clientSocket.send(self.executeCommand(data))
 
     def receiveResponse(self, client):
         blockSize = 1024
