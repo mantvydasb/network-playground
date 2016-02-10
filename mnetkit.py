@@ -120,7 +120,7 @@ class mnetkit():
 
                 # read file's content;
                 fileData = self.executeCommand("cat " + filePath)
-                data = (DOWNLOAD_ANCHOR + fileName).encode("utf8") + fileData
+                data = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
 
                 clientSocket.send(data)
 
@@ -145,12 +145,12 @@ class mnetkit():
 
             # if it was a request to download file, save the file's contents;
             if DOWNLOAD_ANCHOR in response:
-                fileName = response.split("#")[2].rstrip()
-                response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName)
+                fileName = response.split("#")[2]
+                response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
                 file = open(fileName, mode="w+")
                 file.write(response)
                 file.close()
-                print(fileName + " downloaded to " + os.getcwd())
+                print(fileName.rstrip() + " downloaded to " + os.getcwd())
             # print out the the response
             else:
                 print("\n" + response)
