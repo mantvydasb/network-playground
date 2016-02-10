@@ -3,6 +3,8 @@ import socket
 import getopt
 import threading
 import subprocess
+import os
+
 
 DOWNLOAD_ANCHOR = "#download#"
 UPLOAD_ANCHOR = "#upload#"
@@ -111,9 +113,15 @@ class mnetkit():
             print("Executing: " + data)
 
             if "download" in data:
-                print("Seems like we will be downloading stuff")
-                fileData = self.executeCommand("cat /etc/fstab")
-                data = (DOWNLOAD_ANCHOR).encode("utf8") + fileData
+                # parse out file path and file name to be downloaded;
+                filePath = data.split(" ")[1]
+                brokenDownPath = filePath.split("/")
+                fileName = brokenDownPath[len(brokenDownPath) - 1]
+
+                # read file's content;
+                fileData = self.executeCommand("cat " + filePath)
+                data = (DOWNLOAD_ANCHOR + fileName).encode("utf8") + fileData
+
                 clientSocket.send(data)
 
             elif "upload" in data:
@@ -137,10 +145,12 @@ class mnetkit():
 
             # if it was a request to download file, save the file's contents;
             if DOWNLOAD_ANCHOR in response:
-                response = receivedData.strip(DOWNLOAD_ANCHOR)
-                file = open("pienas.txt", mode="w+")
+                fileName = response.split("#")[2].rstrip()
+                response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName)
+                file = open(fileName, mode="w+")
                 file.write(response)
                 file.close()
+                print(fileName + " downloaded to " + os.getcwd())
             # print out the the response
             else:
                 print("\n" + response)
