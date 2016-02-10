@@ -114,7 +114,7 @@ class mnetkit():
 
             if "download" in data:
                 # parse out file path and file name to be downloaded;
-                filePath = data.split(" ")[1]
+                filePath = data.split(" ")[0]
                 brokenDownPath = filePath.split("/")
                 fileName = brokenDownPath[len(brokenDownPath) - 1]
 
