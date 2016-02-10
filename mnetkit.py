@@ -4,6 +4,9 @@ import getopt
 import threading
 import subprocess
 
+DOWNLOAD_ANCHOR = "#download#"
+UPLOAD_ANCHOR = "#upload#"
+
 class mnetkit():
     COMMAND = False
     UPLOAD_DESTINATION = ""
@@ -71,6 +74,7 @@ class mnetkit():
     def connectToHost(self, host, port):
         remoteAddress = host, int(port)
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         clientSocket.connect(remoteAddress)
         return clientSocket
 
@@ -78,8 +82,7 @@ class mnetkit():
         command = self.captureCommand()
         if (command.__len__() > 0):
             self.clientSocket.send(command.encode("utf8"))
-            self.receiveResponse(self.clientSocket)
-            self.sendCommand()
+            self.handleServerResponse(self.clientSocket)
 
     def startListening(self):
         print ("Listening on " + self.HOST + ":" + str(self.PORT))
@@ -95,23 +98,32 @@ class mnetkit():
 
     def executeCommand(self, command):
         command = command.rstrip()
+        try:
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+        except:
+            output = "Failed to execute command!".encode("utf8")
+        return "Command did not return any data".encode("utf8") if not output else output
 
-        if "download" in command:
-            print("Seems like we will be downloading stuff")
-        else:
-            try:
-                output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-            except:
-                output = "Failed to execute command!".encode("utf8")
-            return "Command did not return any data".encode("utf8") if not output else output
-
+    # server receives the request and processes it;
     def handleClientRequest(self, clientSocket):
         while True:
             data = clientSocket.recv(1024).decode("utf8")
             print("Executing: " + data)
-            clientSocket.send(self.executeCommand(data))
 
-    def receiveResponse(self, client):
+            if "download" in data:
+                print("Seems like we will be downloading stuff")
+                fileData = self.executeCommand("cat /etc/fstab")
+                data = (DOWNLOAD_ANCHOR).encode("utf8") + fileData
+                clientSocket.send(data)
+
+            elif "upload" in data:
+                print("Seems like we will be uploading stuff")
+
+            else:
+                clientSocket.send(self.executeCommand(data))
+
+    # client receives the response for the request sent earlier;
+    def handleServerResponse(self, client):
         blockSize = 1024
         response = ""
         receivedDataLength = 1
@@ -122,7 +134,16 @@ class mnetkit():
                 receivedDataLength = len(receivedData)
                 response += receivedData
                 if receivedDataLength < blockSize: break
-            print("\n" + response)
+
+            # if it was a request to download file, save the file's contents;
+            if DOWNLOAD_ANCHOR in response:
+                response = receivedData.strip(DOWNLOAD_ANCHOR)
+                file = open("pienas.txt", mode="w+")
+                file.write(response)
+                file.close()
+            # print out the the response
+            else:
+                print("\n" + response)
             self.sendCommand()
 
 kit = mnetkit()
