@@ -22,7 +22,8 @@ class mnetkit():
         print("Usage: mnetkit.py -t IP -p PORT [-options]")
         print("-l                   Open up port for incoming connections on [IP]:[PORT]")
         print("-c                   Initialise a command shell")
-        print("-u file_to_upload    Upload specified file to [IP]:[PORT]")
+        print("download /path/file  Download a file from remote machine")
+        print("upload /path/file    Upload a file to remote machine")
         print("-e file_to_run       Execute a command when connection is received. Example: mnetkit.py -t 192.168.55 -p 5555 -e /bin/bash")
         print("-h                   Display help/usage")
         sys.exit()
@@ -109,25 +110,28 @@ class mnetkit():
     # server receives the request and processes it;
     def handleClientRequest(self, clientSocket):
         while True:
-            data = clientSocket.recv(1024).decode("utf8")
-            print("Executing: " + data)
+            clientRequest = clientSocket.recv(1024).decode("utf8")
+            print("Executing: " + clientRequest)
 
-            if "download" in data:
-                # parse out file path and file name to be downloaded;
-                filePath = data[data.find(" ") + 1:]
-                brokenDownPath = filePath.split("/")
-                fileName = brokenDownPath[len(brokenDownPath) - 1].strip('"')
+            if "download" in clientRequest:
+                fileName, filePath = self.getFileNameAndPath(clientRequest)
+                fileData = self.readFileData(filePath)
+                package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
+                clientSocket.send(package)
 
-                # read file's content;
-                fileData = self.executeCommand("cat " + filePath)
-                data = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
-
-                clientSocket.send(data)
-
-            elif "upload" in data:
+            elif "upload" in clientRequest:
                 print("Seems like we will be uploading stuff")
             else:
-                clientSocket.send(self.executeCommand(data))
+                clientSocket.send(self.executeCommand(clientRequest))
+
+    def readFileData(self, filePath):
+        return self.executeCommand("cat " + filePath)
+
+    def getFileNameAndPath(self, clientRequest):
+        filePath = clientRequest[clientRequest.find(" ") + 1:]
+        brokenDownPath = filePath.split("/")
+        fileName = brokenDownPath[len(brokenDownPath) - 1].strip('"')
+        return fileName, filePath
 
     # client receives the response for the request sent earlier;
     def handleServerResponse(self, client):
@@ -142,18 +146,25 @@ class mnetkit():
                 response += receivedData
                 if receivedDataLength < blockSize: break
 
-            # if it was a request to download file, save the file's contents;
+            # was request to download a file?
             if DOWNLOAD_ANCHOR in response:
-                fileName = response.split("#")[2]
-                response = response.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
-                # response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
-                file = open(fileName, mode="w+")
-                file.write(response)
-                file.close()
+                fileName, response = self.getFileNameAndFileData(response)
+                self.saveToFile(fileName, response)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
-            # print out the the response
+            # print response;
             else:
                 print("\n" + response)
+
             self.sendCommand()
+
+    def saveToFile(self, fileName, fileData):
+        file = open(fileName, mode="w+")
+        file.write(fileData)
+        file.close()
+
+    def getFileNameAndFileData(self, response):
+        fileName = response.split("#")[2]
+        response = response.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
+        return fileName, response
 
 kit = mnetkit()
