@@ -114,9 +114,9 @@ class mnetkit():
 
             if "download" in data:
                 # parse out file path and file name to be downloaded;
-                filePath = data.split(" ")[0]
+                filePath = data[data.find(" ") + 1:]
                 brokenDownPath = filePath.split("/")
-                fileName = brokenDownPath[len(brokenDownPath) - 1]
+                fileName = brokenDownPath[len(brokenDownPath) - 1].strip('"')
 
                 # read file's content;
                 fileData = self.executeCommand("cat " + filePath)
@@ -126,7 +126,6 @@ class mnetkit():
 
             elif "upload" in data:
                 print("Seems like we will be uploading stuff")
-
             else:
                 clientSocket.send(self.executeCommand(data))
 
@@ -146,7 +145,8 @@ class mnetkit():
             # if it was a request to download file, save the file's contents;
             if DOWNLOAD_ANCHOR in response:
                 fileName = response.split("#")[2]
-                response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
+                response = response.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
+                # response = receivedData.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
                 file = open(fileName, mode="w+")
                 file.write(response)
                 file.close()
