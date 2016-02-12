@@ -83,7 +83,7 @@ class mnetkit():
 
     def sendCommand(self):
         command = self.captureCommand()
-        if (command.__len__() > 0):
+        if (len(command) > 0):
             self.clientSocket.send(command.encode("utf8"))
             self.handleServerResponse(self.clientSocket)
 
@@ -109,6 +109,7 @@ class mnetkit():
 
     # server receives the request and processes it;
     def handleClientRequest(self, clientSocket):
+
         while True:
             clientRequest = clientSocket.recv(1024).decode("utf8")
             print("Executing: " + clientRequest)
@@ -116,11 +117,14 @@ class mnetkit():
             if "download" in clientRequest:
                 fileName, filePath = self.getFileNameAndPath(clientRequest)
                 fileData = self.readFileData(filePath)
+
                 package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
                 clientSocket.send(package)
 
-            elif "upload" in clientRequest:
-                print("Seems like we will be uploading stuff")
+            # elif "upload" in clientRequest:
+            #     fileName, filePath = self.getFileNameAndPath(clientRequest)
+            #     fileData = self.readFileData(filePath)
+
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
 
