@@ -19,8 +19,3 @@ while True:
     print("Incoming connection: " + str(address))
     clientHandler = threading.Thread(target=handleClient, args=[client])
     clientHandler.start()
-
-
-
-
-
