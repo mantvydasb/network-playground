@@ -84,8 +84,17 @@ class mnetkit():
     def sendCommand(self):
         command = self.captureCommand()
         if (len(command) > 0):
-            self.clientSocket.send(command.encode("utf8"))
+            if "upload" in command:
+                package = self.buildPackageToUpload(command)
+            else:
+                package = command.encode("utf8")
+            self.clientSocket.send(package)
             self.handleServerResponse(self.clientSocket)
+
+    def buildPackageToUpload(self, command):
+        fileName, filePath = self.getFileNameAndPath(command)
+        fileData = self.readFileData(filePath)
+        return (UPLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
 
     def startListening(self):
         print ("Listening on " + self.HOST + ":" + str(self.PORT))
@@ -109,24 +118,25 @@ class mnetkit():
 
     # server receives the request and processes it;
     def handleClientRequest(self, clientSocket):
-
         while True:
             clientRequest = clientSocket.recv(1024).decode("utf8")
             print("Executing: " + clientRequest)
 
             if "download" in clientRequest:
-                fileName, filePath = self.getFileNameAndPath(clientRequest)
-                fileData = self.readFileData(filePath)
-
-                package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
+                package = self.buildPackageToDownload(clientRequest)
                 clientSocket.send(package)
 
-            # elif "upload" in clientRequest:
-            #     fileName, filePath = self.getFileNameAndPath(clientRequest)
-            #     fileData = self.readFileData(filePath)
-
+            elif "upload" in clientRequest:
+                # this is where I will have to write out all the received buffers to a file, meaning the file gets uploaded to a remote host;
+                print("Seems like we will be uploading stuff")
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
+
+    def buildPackageToDownload(self, clientRequest):
+        fileName, filePath = self.getFileNameAndPath(clientRequest)
+        fileData = self.readFileData(filePath)
+        package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
+        return package
 
     def readFileData(self, filePath):
         return self.executeCommand("cat " + filePath)
