@@ -127,10 +127,17 @@ class mnetkit():
                 clientRequest += receivedData
                 if (receivedDataLength < blockSize): break
 
+            # client downloads from remote host;
             if "download" in clientRequest:
                 package = self.buildPackageForDownload(clientRequest)
                 clientSocket.send(package)
 
+            # if "gnome-screenshot" in clientRequest:
+                # self.executeCommand("gnome-screenshot")
+                # package = self.buildPackageForDownload(clientRequest)
+                # clientSocket.send(package)
+
+            # remote host send the file back to the client;
             elif "upload" in clientRequest:
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
@@ -174,9 +181,8 @@ class mnetkit():
                 fileName, response = self.getFileNameAndFileData(response)
                 self.saveToFile(fileName, response)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
-            # print response;
             else:
-                print("\n" + response)
+                print(response)
 
             self.sendCommand()
 
