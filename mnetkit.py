@@ -118,9 +118,16 @@ class mnetkit():
 
     # server receives the request and processes it;
     def handleClientRequest(self, clientSocket):
+        clientRequest = ''
+        receivedDataLength = 1
+        blockSize = 400
+
         while True:
-            clientRequest = clientSocket.recv(1024).decode("utf8")
-            print("Executing: " + clientRequest)
+            while receivedDataLength:
+                receivedData = clientSocket.recv(blockSize).decode("utf8")
+                receivedDataLength = len(receivedData)
+                clientRequest += receivedData
+                if (receivedDataLength < blockSize): break
 
             if "download" in clientRequest:
                 package = self.buildPackageForDownload(clientRequest)
@@ -132,8 +139,10 @@ class mnetkit():
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
+                clientSocket.send(b'File uploaded!')
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
+            print("Executing: " + clientRequest)
 
     def buildPackageForDownload(self, clientRequest):
         fileName, filePath = self.getFileNameAndPath(clientRequest)
@@ -181,7 +190,12 @@ class mnetkit():
 
     def getFileNameAndFileData(self, response):
         fileName = response.split("#")[2]
-        response = response.strip(DOWNLOAD_ANCHOR).strip(fileName + "#")
-        return fileName, response
+        anchor = ''
+        if DOWNLOAD_ANCHOR in response:
+            anchor = DOWNLOAD_ANCHOR
+        elif UPLOAD_ANCHOR in response:
+            anchor = UPLOAD_ANCHOR
+        fileData = response.strip(anchor).strip(fileName + "#")
+        return fileName, fileData
 
 kit = mnetkit()
