@@ -85,13 +85,13 @@ class mnetkit():
         command = self.captureCommand()
         if (len(command) > 0):
             if "upload" in command:
-                package = self.buildPackageToUpload(command)
+                package = self.buildPackageForUpload(command)
             else:
                 package = command.encode("utf8")
             self.clientSocket.send(package)
             self.handleServerResponse(self.clientSocket)
 
-    def buildPackageToUpload(self, command):
+    def buildPackageForUpload(self, command):
         fileName, filePath = self.getFileNameAndPath(command)
         fileData = self.readFileData(filePath)
         return (UPLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
@@ -123,16 +123,19 @@ class mnetkit():
             print("Executing: " + clientRequest)
 
             if "download" in clientRequest:
-                package = self.buildPackageToDownload(clientRequest)
+                package = self.buildPackageForDownload(clientRequest)
                 clientSocket.send(package)
 
             elif "upload" in clientRequest:
                 # this is where I will have to write out all the received buffers to a file, meaning the file gets uploaded to a remote host;
                 print("Seems like we will be uploading stuff")
+                fileName, fileData = self.getFileNameAndFileData(clientRequest)
+                self.saveToFile(fileName, fileData)
+                print(fileName.rstrip() + " downloaded to " + os.getcwd())
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
 
-    def buildPackageToDownload(self, clientRequest):
+    def buildPackageForDownload(self, clientRequest):
         fileName, filePath = self.getFileNameAndPath(clientRequest)
         fileData = self.readFileData(filePath)
         package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
