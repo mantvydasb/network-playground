@@ -38,7 +38,6 @@ class mnetkit():
         for (option, argument) in options:
             if option in ("-h"):
                 self.displayUsage()
-            # defines if this instance is a server (-l) or a client
             if option in ("-l"):
                 isListening = True
                 self.startListening()
@@ -64,8 +63,6 @@ class mnetkit():
         else:
             try:
                 options, arguments = getopt.getopt(arguments, "hle:t:p:c:u:")
-                # print("Options: " + str(options) + "\n")
-                # print("Arguments: " + str(arguments) + "\n")
                 return options, arguments
             except getopt.GetoptError as error:
                 print(str(error))
@@ -120,7 +117,7 @@ class mnetkit():
     def handleClientRequest(self, clientSocket):
         clientRequest = ''
         receivedDataLength = 1
-        blockSize = 400
+        blockSize = 1024
 
         while True:
             while receivedDataLength:
@@ -134,8 +131,6 @@ class mnetkit():
                 clientSocket.send(package)
 
             elif "upload" in clientRequest:
-                # this is where I will have to write out all the received buffers to a file, meaning the file gets uploaded to a remote host;
-                print("Seems like we will be uploading stuff")
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
@@ -172,7 +167,7 @@ class mnetkit():
                 response += receivedData
                 if receivedDataLength < blockSize: break
 
-            # was request to download a file?
+            # am I being sent a file?! Well then save it!
             if DOWNLOAD_ANCHOR in response:
                 fileName, response = self.getFileNameAndFileData(response)
                 self.saveToFile(fileName, response)
