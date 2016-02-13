@@ -121,6 +121,7 @@ class mnetkit():
 
         while True:
             while receivedDataLength:
+                clientRequest = ''
                 receivedData = clientSocket.recv(blockSize).decode("utf8")
                 receivedDataLength = len(receivedData)
                 clientRequest += receivedData
@@ -137,6 +138,7 @@ class mnetkit():
                 clientSocket.send(b'File uploaded!')
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
+
             print("Executing: " + clientRequest)
 
     def buildPackageForDownload(self, clientRequest):
