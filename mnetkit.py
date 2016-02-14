@@ -10,12 +10,12 @@ DOWNLOAD_ANCHOR = "#download#"
 UPLOAD_ANCHOR = "#upload#"
 
 class mnetkit():
-    COMMAND = False
-    UPLOAD_DESTINATION = ""
-    EXECUTE = ""
-    HOST = None
-    PORT = 0
-    clientSocket = ""
+    command = False
+    uploadDestination = ""
+    execute = ""
+    host = None
+    port = 0
+    client = ""
 
     def displayUsage(self):
         print("Welcome to MNetkit\n")
@@ -42,16 +42,16 @@ class mnetkit():
                 isListening = True
                 self.startListening()
             if option in ("-t"):
-                self.HOST = argument
+                self.host = argument
             if option in ("-p"):
-                self.PORT = argument
+                self.port = argument
             if option in ("-e"):
-                self.EXECUTE = argument
+                self.execute = argument
             if option in ("-u"):
-                self.UPLOAD_DESTINATION = argument
+                self.uploadDestination = argument
 
-        if not isListening and self.HOST:
-            self.clientSocket = self.connectToHost(self.HOST, self.PORT)
+        if not isListening and self.host:
+            self.client = self.connectToHost(self.host, self.port)
             self.sendCommand()
 
     def parseArguments(self):
@@ -85,8 +85,8 @@ class mnetkit():
                 package = self.buildPackageForUpload(command)
             else:
                 package = command.encode("utf8")
-            self.clientSocket.send(package)
-            self.handleServerResponse(self.clientSocket)
+            self.client.send(package)
+            self.handleServerResponse(self.client)
 
     def buildPackageForUpload(self, command):
         fileName, filePath = self.getFileNameAndPath(command)
@@ -94,15 +94,15 @@ class mnetkit():
         return (UPLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
 
     def startListening(self):
-        print ("Listening on " + self.HOST + ":" + str(self.PORT))
+        print ("Listening on " + self.host + ":" + str(self.port))
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind((self.HOST, int(self.PORT)))
+        server.bind((self.host, int(self.port)))
         server.listen(5)
 
         while True:
-            clientSocket, clientAddress = server.accept()
+            client, address = server.accept()
             print("Incoming connection..")
-            clientThread = threading.Thread(target=self.handleClientRequest, args=[clientSocket])
+            clientThread = threading.Thread(target=self.handleClientRequest, args=[client])
             clientThread.start()
 
     def executeCommand(self, command):
@@ -114,7 +114,7 @@ class mnetkit():
         return "Command did not return any data".encode("utf8") if not output else output
 
     # server receives the request and processes it;
-    def handleClientRequest(self, clientSocket):
+    def handleClientRequest(self, client):
         clientRequest = ''
         receivedDataLength = 1
         blockSize = 1024
@@ -122,7 +122,7 @@ class mnetkit():
         while True:
             while receivedDataLength:
                 clientRequest = ''
-                receivedData = clientSocket.recv(blockSize).decode("utf8")
+                receivedData = client.recv(blockSize).decode("utf8")
                 receivedDataLength = len(receivedData)
                 clientRequest += receivedData
                 if (receivedDataLength < blockSize): break
@@ -130,7 +130,7 @@ class mnetkit():
             # client downloads from remote host;
             if "download" in clientRequest:
                 package = self.buildPackageForDownload(clientRequest)
-                clientSocket.send(package)
+                client.send(package)
 
             # if "gnome-screenshot" in clientRequest:
             #     find a way to upload/download screenshots
@@ -143,9 +143,9 @@ class mnetkit():
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
-                clientSocket.send(b'File uploaded!')
+                client.send(b'File uploaded!')
             else:
-                clientSocket.send(self.executeCommand(clientRequest))
+                client.send(self.executeCommand(clientRequest))
 
             print("Executing: " + clientRequest)
 
