@@ -43,7 +43,7 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
         remoteBufferLength = len(remoteHost)
 
         if remoteBufferLength:
-            print("Sending %d bytes to localhost", remoteBufferLength)
+            print("Sending %d bytes to localhost" % remoteBufferLength)
             clientSocket.send(remoteBuffer)
 
     # read from local -> send to remote;
@@ -52,13 +52,16 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
         localBufferLength = len(localBuffer)
 
         if localBufferLength:
-            print("Received %d bytes from localhost", localBufferLength)
+            print("Received %d bytes from localhost" % localBufferLength)
             hexdump(localBuffer)
             localBuffer = modifyLocalBuffer(localBuffer)
             remoteSocket.send(localBuffer)
             print("Sent to remote")
 
         remoteBuffer = receiveFrom(remoteSocket)
+
+        if len(remoteBuffer):
+            print("Received %d bytes from remote" % len(remoteBuffer))
 
 
 
