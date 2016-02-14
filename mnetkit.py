@@ -133,6 +133,7 @@ class mnetkit():
                 clientSocket.send(package)
 
             # if "gnome-screenshot" in clientRequest:
+            #     find a way to upload/download screenshots
                 # self.executeCommand("gnome-screenshot")
                 # package = self.buildPackageForDownload(clientRequest)
                 # clientSocket.send(package)
