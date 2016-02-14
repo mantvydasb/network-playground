@@ -15,7 +15,7 @@ class mnetkit():
     execute = ""
     host = None
     port = 0
-    client = ""
+    clientSocket = ""
 
     def displayUsage(self):
         print("Welcome to MNetkit\n")
@@ -51,7 +51,7 @@ class mnetkit():
                 self.uploadDestination = argument
 
         if not isListening and self.host:
-            self.client = self.connectToHost(self.host, self.port)
+            self.clientSocket = self.connectToHost(self.host, self.port)
             self.sendCommand()
 
     def parseArguments(self):
@@ -85,8 +85,8 @@ class mnetkit():
                 package = self.buildPackageForUpload(command)
             else:
                 package = command.encode("utf8")
-            self.client.send(package)
-            self.handleServerResponse(self.client)
+            self.clientSocket.send(package)
+            self.handleServerResponse(self.clientSocket)
 
     def buildPackageForUpload(self, command):
         fileName, filePath = self.getFileNameAndPath(command)
@@ -100,9 +100,9 @@ class mnetkit():
         server.listen(5)
 
         while True:
-            client, address = server.accept()
+            clientSocket, address = server.accept()
             print("Incoming connection..")
-            clientThread = threading.Thread(target=self.handleClientRequest, args=[client])
+            clientThread = threading.Thread(target=self.handleClientRequest, args=[clientSocket])
             clientThread.start()
 
     def executeCommand(self, command):
@@ -114,7 +114,7 @@ class mnetkit():
         return "Command did not return any data".encode("utf8") if not output else output
 
     # server receives the request and processes it;
-    def handleClientRequest(self, client):
+    def handleClientRequest(self, clientSocket):
         clientRequest = ''
         receivedDataLength = 1
         blockSize = 1024
@@ -122,7 +122,7 @@ class mnetkit():
         while True:
             while receivedDataLength:
                 clientRequest = ''
-                receivedData = client.recv(blockSize).decode("utf8")
+                receivedData = clientSocket.recv(blockSize).decode("utf8")
                 receivedDataLength = len(receivedData)
                 clientRequest += receivedData
                 if (receivedDataLength < blockSize): break
@@ -130,7 +130,7 @@ class mnetkit():
             # client downloads from remote host;
             if "download" in clientRequest:
                 package = self.buildPackageForDownload(clientRequest)
-                client.send(package)
+                clientSocket.send(package)
 
             # if "gnome-screenshot" in clientRequest:
             #     find a way to upload/download screenshots
@@ -143,9 +143,9 @@ class mnetkit():
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
                 print(fileName.rstrip() + " downloaded to " + os.getcwd())
-                client.send(b'File uploaded!')
+                clientSocket.send(b'File uploaded!')
             else:
-                client.send(self.executeCommand(clientRequest))
+                clientSocket.send(self.executeCommand(clientRequest))
 
             print("Executing: " + clientRequest)
 
@@ -165,14 +165,14 @@ class mnetkit():
         return fileName, filePath
 
     # client receives the response for the request sent earlier;
-    def handleServerResponse(self, client):
+    def handleServerResponse(self, clientSocket):
         blockSize = 1024
         response = ""
         receivedDataLength = 1
 
         while True:
             while receivedDataLength:
-                receivedData = client.recv(blockSize).decode("utf8")
+                receivedData = clientSocket.recv(blockSize).decode("utf8")
                 receivedDataLength = len(receivedData)
                 response += receivedData
                 if receivedDataLength < blockSize: break
