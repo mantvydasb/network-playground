@@ -21,43 +21,56 @@ def initVariables(self):
 
 def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(localHost, localPort)
+    server.bind((localHost, localPort))
     server.listen(5)
     print ("Listening: " + localHost + " " + str(localPort))
 
     while True:
         clientSocket, address = server.accept()
         print("Incoming connection: " + str(address))
-        proxyThread = threading.Thread(target=handleProxyTraffic, args=[clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst])
+        proxyThread = threading.Thread(target=distributeTraffic, args=[clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst])
         proxyThread.start()
 
-def handleProxyTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
+def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     remoteSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     remoteSocket.connect(remoteHost, remotePort)
 
+    # read from remote -> send to local;
     if shouldReceiveFirst:
         remoteBuffer = receiveFrom(remoteSocket)
         hexdump(remoteBuffer)
-        remoteBuffer = modifyRemoteBuffer(remoteBuffer, remoteHost)
+        remoteBuffer = modifyRemoteBuffer(remoteBuffer)
         remoteBufferLength = len(remoteHost)
 
         if remoteBufferLength:
             print("Sending %d bytes to localhost", remoteBufferLength)
             clientSocket.send(remoteBuffer)
 
-        while True:
-            localBuffer = receiveFrom(clientSocket)
+    # read from local -> send to remote;
+    while True:
+        localBuffer = receiveFrom(clientSocket)
+        localBufferLength = len(localBuffer)
+
+        if localBufferLength:
+            print("Received %d bytes from localhost", localBufferLength)
+            hexdump(localBuffer)
+            localBuffer = modifyLocalBuffer(localBuffer)
+            remoteSocket.send(localBuffer)
+            print("Sent to remote")
+
+        remoteBuffer = receiveFrom(remoteSocket)
 
 
-def modifyRemoteBuffer(remoteBuffer, remoteHost):
+
+def modifyRemoteBuffer(remoteBuffer):
     print("Buffer destined to " + "got modified.")
     return remoteBuffer
 
-def modifyLocalBuffer(localBuffer, localHost):
+def modifyLocalBuffer(localBuffer):
     print("Buffer destined to " + "got modified.")
     return localBuffer
 
-def hexdump(remoteBuffer):
+def hexdump(buffer):
     print("Dumping HEX for remote buffer")
 
 def receiveFrom(remoteSocket):
