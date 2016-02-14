@@ -62,8 +62,15 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
 
         if len(remoteBuffer):
             print("Received %d bytes from remote" % len(remoteBuffer))
+            hexdump(remoteBuffer)
+            remoteBuffer = modifyRemoteBuffer(remoteBuffer)
+            clientSocket.send(remoteBuffer)
+            print("Send to localhost")
 
-
+        if not localBufferLength or not len(remoteBuffer):
+            clientSocket.close()
+            remoteSocket.close()
+            break
 
 def modifyRemoteBuffer(remoteBuffer):
     print("Buffer destined to " + "got modified.")
