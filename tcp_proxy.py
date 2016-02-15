@@ -31,6 +31,9 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
         proxyThread = threading.Thread(target=distributeTraffic, args=[clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst])
         proxyThread.start()
 
+def receiveFrom(remoteSocket):
+    print("stuff")
+
 def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     remoteSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     remoteSocket.connect(remoteHost, remotePort)
@@ -80,11 +83,18 @@ def modifyLocalBuffer(localBuffer):
     print("Buffer destined to " + "got modified.")
     return localBuffer
 
-def hexdump(buffer):
+def hexdump(source, length=16):
     print("Dumping HEX for remote buffer")
+    result = []
+    digits = 4
+    # digits = 4 if isinstance(source, unicode) else 2
 
-def receiveFrom(remoteSocket):
-    print("stuff")
+    for i in range(0, len(source), length):
+        s = source[i:i + length]
+        hexa = b' '.join(["%0*X" % (digits, ord(x)) for x in s])
+
+
+
 
 def main():
     # localHost, localPort, remoteHost, remotePort, shouldReceiveFirst = initVariables()
