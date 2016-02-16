@@ -1,21 +1,29 @@
 import socket
 import threading
+import time
 
-SERVER_ADDRESS = "127.0.0.1", 5555
+SERVER_ADDRESS = "192.168.2.2", 8506
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(SERVER_ADDRESS)
 server.listen(5)
 
-print ("Listening: " + SERVER_ADDRESS[0] + " " + str(SERVER_ADDRESS[1]))
+print ("# Simulating HTTP server on: " + SERVER_ADDRESS[0] + " " + str(SERVER_ADDRESS[1]))
 
 def handleClient(clientSocket):
-    request = clientSocket.recv(1024)
-    print("Received: " + str(request))
-    clientSocket.send(b'ACK')
-    clientSocket.close()
+    while 1:
+        data = clientSocket.recv(1024)
+        if len(data):
+            print("Received: " + str(data))
+        else: break
 
 while True:
-    client, address = server.accept()
+    clientSocket, address = server.accept()
     print("Incoming connection: " + str(address))
-    clientHandler = threading.Thread(target=handleClient, args=[client])
+    clientSocket.send(b'RESPONSE PACKET FROM THE WEBSERVER at ' + str(SERVER_ADDRESS).encode("utf8"))
+
+    # while True:
+    #     print("Sending a packet...")
+    #     time.sleep(10)
+
+    clientHandler = threading.Thread(target=handleClient, args=[clientSocket])
     clientHandler.start()
