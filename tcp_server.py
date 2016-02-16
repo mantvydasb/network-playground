@@ -17,13 +17,11 @@ def handleClient(clientSocket):
         else: break
 
 while True:
+    # clientSocket - l_address - simulated http server on 192.168.2.2 8506;
+    # clientSocket - r_address - proxy server, which connected to our simulated http server on behalf of the client when firefox tried accessing a URL;
     clientSocket, address = server.accept()
     print("Incoming connection: " + str(address))
     clientSocket.send(b'RESPONSE PACKET FROM THE WEBSERVER at ' + str(SERVER_ADDRESS).encode("utf8"))
-
-    # while True:
-    #     print("Sending a packet...")
-    #     time.sleep(10)
 
     clientHandler = threading.Thread(target=handleClient, args=[clientSocket])
     clientHandler.start()
