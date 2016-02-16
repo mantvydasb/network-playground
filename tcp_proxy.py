@@ -34,7 +34,6 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
     print("Incoming connection from client: " + str(address))
     proxyThread = threading.Thread(target=distributeTraffic, args=(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst))
     proxyThread.start()
-    clientSocket.send(b'Welcome to Pienas server @ 5555. Connection acknowledged.')
 
 def receiveFrom(socket):
     buffer = b''
