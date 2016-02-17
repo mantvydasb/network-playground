@@ -10,7 +10,9 @@ server.listen(5)
 print ("# Simulating HTTP server on: " + SERVER_ADDRESS[0] + " " + str(SERVER_ADDRESS[1]))
 
 def handleClient(clientSocket):
+    print("handlinam clienta")
     while 1:
+        print("handlinam clienta is loopo")
         data = clientSocket.recv(1024)
         if len(data):
             print("Received: " + str(data))

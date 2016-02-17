@@ -37,13 +37,16 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
 
 def receiveFrom(socket):
     buffer = b''
-    socket.settimeout(2)
+    # socket.settimeout(10)
 
     while True:
-        data = socket.recv(4096)
-        if not data: break
-        else: buffer += data
-    return buffer
+        data = socket.recv(1024)
+        buffer += data
+        # if len(data):
+        #     pass
+        # else: break
+        return buffer
+        # return buffer
 
 def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     remoteSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,15 +54,16 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
 
     while True:
         # local data going through proxy to remote socket
-        localBuffer = receiveFrom(clientSocket)
-        localBufferLength = len(localBuffer)
+        if shouldReceiveFirst:
+            localBuffer = receiveFrom(clientSocket)
+            localBufferLength = len(localBuffer)
 
-        if len(localBuffer):
-            print("Received %d bytes from localhost" % localBufferLength)
-            hexdump(localBuffer)
-            localBuffer = modifyLocalBuffer(localBuffer)
-            remoteSocket.send(localBuffer)
-            print("Sent to remote")
+            if len(localBuffer):
+                print("Received %d bytes from localhost" % localBufferLength)
+                hexdump(localBuffer)
+                localBuffer = modifyLocalBuffer(localBuffer)
+                remoteSocket.send(localBuffer)
+                print("Sent to remote")
 
         # remote data going through proxy to local socket
         remoteBuffer = receiveFrom(remoteSocket)
@@ -74,7 +78,8 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
 
 def modifyRemoteBuffer(remoteBuffer):
     print("Buffer destined to remote host " + "got modified.")
-    return remoteBuffer + " modified".encode("utf8")
+    return remoteBuffer
+    # return remoteBuffer + " modified".encode("utf8")
 
 def modifyLocalBuffer(localBuffer):
     print("Buffer destined to local host" + "got modified.")
@@ -90,7 +95,7 @@ def main():
     localHost = LOCAL_HOST
     localPort = LOCAL_PORT
     remoteHost = "192.168.2.2"
-    remotePort = 8506
+    remotePort = 21
     shouldReceiveFirst = False
     startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFirst)
 
