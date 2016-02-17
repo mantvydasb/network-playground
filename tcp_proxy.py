@@ -4,7 +4,6 @@ import sys
 
 LOCAL_HOST = "192.168.2.2"
 LOCAL_PORT = 8080
-# LOCAL_ADDRESS = "127.0.0.1", 5555
 
 def initVariables():
     arguments = sys.argv[1:]
@@ -37,16 +36,11 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
 
 def receiveFrom(socket):
     buffer = b''
-    # socket.settimeout(10)
+    # socket.settimeout(20)
 
     while True:
         data = socket.recv(1024)
-        buffer += data
-        # if len(data):
-        #     pass
-        # else: break
-        return buffer
-        # return buffer
+        return data
 
 def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     remoteSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,16 +48,15 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
 
     while True:
         # local data going through proxy to remote socket
-        if shouldReceiveFirst:
-            localBuffer = receiveFrom(clientSocket)
-            localBufferLength = len(localBuffer)
+        localBuffer = receiveFrom(clientSocket)
+        localBufferLength = len(localBuffer)
 
-            if len(localBuffer):
-                print("Received %d bytes from localhost" % localBufferLength)
-                hexdump(localBuffer)
-                localBuffer = modifyLocalBuffer(localBuffer)
-                remoteSocket.send(localBuffer)
-                print("Sent to remote")
+        if len(localBuffer):
+            print("Received %d bytes from localhost" % localBufferLength)
+            hexdump(localBuffer)
+            localBuffer = modifyLocalBuffer(localBuffer)
+            remoteSocket.send(localBuffer)
+            print("Sent to remote")
 
         # remote data going through proxy to local socket
         remoteBuffer = receiveFrom(remoteSocket)
@@ -77,12 +70,9 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
             print("Send to localhost")
 
 def modifyRemoteBuffer(remoteBuffer):
-    print("Buffer destined to remote host " + "got modified.")
     return remoteBuffer
-    # return remoteBuffer + " modified".encode("utf8")
 
 def modifyLocalBuffer(localBuffer):
-    print("Buffer destined to local host" + "got modified.")
     return localBuffer
 
 def hexdump(source, length=16):
@@ -91,7 +81,6 @@ def hexdump(source, length=16):
 
 def main():
     # localHost, localPort, remoteHost, remotePort, shouldReceiveFirst = initVariables()
-
     localHost = LOCAL_HOST
     localPort = LOCAL_PORT
     remoteHost = "192.168.2.2"
