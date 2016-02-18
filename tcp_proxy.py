@@ -36,6 +36,7 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
 
 def receiveFrom(socket):
     buffer = b''
+    data = b''
     # socket.settimeout(20)
 
     while True:
@@ -85,7 +86,7 @@ def main():
     localPort = LOCAL_PORT
     remoteHost = "192.168.2.2"
     remotePort = 21
-    shouldReceiveFirst = False
+    shouldReceiveFirst = True
     startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFirst)
 
 main()
