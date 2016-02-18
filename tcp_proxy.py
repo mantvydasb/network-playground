@@ -3,7 +3,7 @@ import threading
 import sys
 
 LOCAL_HOST = "192.168.2.2"
-LOCAL_PORT = 8080
+LOCAL_PORT = 8081
 
 def initVariables():
     arguments = sys.argv[1:]
@@ -37,38 +37,41 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
 def receiveFrom(socket):
     buffer = b''
     data = b''
-    # socket.settimeout(20)
+    receivedDataLength = 1
+    socket.settimeout(5)
 
     while True:
-        data = socket.recv(1024)
-        return data
+        while receivedDataLength:
+            data = socket.recv(4098)
+            receivedDataLength = len(data)
+            buffer += data
+            if receivedDataLength < 4098: break
+        return buffer
 
 def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     remoteSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     remoteSocket.connect((remoteHost, int(remotePort)))
 
     while True:
-        # local data going through proxy to remote socket
-        localBuffer = receiveFrom(clientSocket)
-        localBufferLength = len(localBuffer)
-
-        if len(localBuffer):
-            print("Received %d bytes from localhost" % localBufferLength)
-            hexdump(localBuffer)
-            localBuffer = modifyLocalBuffer(localBuffer)
-            remoteSocket.send(localBuffer)
-            print("Sent to remote")
-
         # remote data going through proxy to local socket
         remoteBuffer = receiveFrom(remoteSocket)
         remoteBufferLength = len(remoteBuffer)
 
         if remoteBufferLength:
             print("Received %d bytes from remote" % remoteBufferLength)
-            hexdump(remoteBuffer)
-            remoteBuffer = modifyRemoteBuffer(remoteBuffer)
             clientSocket.send(remoteBuffer)
-            print("Send to localhost")
+            print("Send to localhost: " + remoteBuffer.decode("utf8"))
+
+
+        # local data going through proxy to remote socket
+        localBuffer = receiveFrom(clientSocket)
+        localBufferLength = len(localBuffer)
+
+        if len(localBuffer):
+            print("Received %d bytes from localhost" % localBufferLength)
+            remoteSocket.send(localBuffer)
+            print("Sent to remote: " + localBuffer.decode("utf8"))
+
 
 def modifyRemoteBuffer(remoteBuffer):
     return remoteBuffer
