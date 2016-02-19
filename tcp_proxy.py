@@ -30,7 +30,7 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
     # client socket - socket from a firefox web request with proxy pointing to 192.168.2.2 5555, hence we're picking up the connection request;
     # l_addres - proxy server address, r_address - client, which connected to our proxy, address;
     clientSocket, address = server.accept()
-    print("Incoming connection from FTP client: " + str(address))
+    print("Incoming connection from FTP client: " + str(address) + '\n')
     proxyThread = threading.Thread(target=distributeTraffic, args=(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst))
     proxyThread.start()
 
@@ -54,7 +54,6 @@ def distributeTraffic(clientSocket, localHost, localPort, remoteHost, remotePort
 
 
     while True:
-
         # remote data going through proxy to local socket
         remoteBuffer = receiveFrom(remoteSocket)
         remoteBufferLength = len(remoteBuffer)
