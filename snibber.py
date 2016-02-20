@@ -2,7 +2,7 @@ import socket
 import os
 import subprocess
 
-PROMISCUOUS_CMD_BASE = "ip link set enp0s31f6 promisc "
+PROMISCUOUS_MODE = "ip link set enp0s31f6 promisc "
 
 class snibber:
     host = "192.168.2.2"
@@ -15,10 +15,10 @@ class snibber:
             print(snifferSocket.recvfrom(65565))
 
     def setPromiscOn(self):
-        subprocess.Popen(PROMISCUOUS_CMD_BASE + "on", shell=True)
+        subprocess.Popen(PROMISCUOUS_MODE + "on", shell=True)
 
     def setPromiscOff(self):
-        subprocess.Popen(PROMISCUOUS_CMD_BASE + "off", shell=True)
+        subprocess.Popen(PROMISCUOUS_MODE + "off", shell=True)
 
     def isThiswindows(self):
         return True if "nt" in os.name else False
