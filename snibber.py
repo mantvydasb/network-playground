@@ -9,16 +9,19 @@ class snibber:
 
     def __init__(self):
         snifferSocket = self.startListening()
-        self.setPromiscOn()
+        self.setPromiscuousOn()
 
         while True:
             print(snifferSocket.recvfrom(65565))
 
-    def setPromiscOn(self):
-        subprocess.Popen(PROMISCUOUS_MODE + "on", shell=True)
+    def setPromiscuousOn(self):
+        self.setPromiscuousMode("on")
 
-    def setPromiscOff(self):
-        subprocess.Popen(PROMISCUOUS_MODE + "off", shell=True)
+    def setPromiscuousOff(self):
+        self.setPromiscuousMode("off")
+
+    def setPromiscuousMode(self, mode):
+        subprocess.Popen(PROMISCUOUS_MODE + mode, shell=True)
 
     def isThiswindows(self):
         return True if "nt" in os.name else False
