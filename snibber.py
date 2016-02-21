@@ -1,10 +1,11 @@
 import socket
 import os
 import subprocess
+import ip_header_builder
 
 PROMISCUOUS_MODE = "ip link set enp0s31f6 promisc "
 
-class snibber:
+class Snibber:
     host = "192.168.2.2"
 
     def __init__(self):
@@ -47,5 +48,5 @@ class snibber:
         print()
 
 
-snibber = snibber()
+snibber = Snibber()
 
