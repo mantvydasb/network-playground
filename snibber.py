@@ -11,9 +11,15 @@ class Snibber:
     def __init__(self):
         snifferSocket = self.startListening()
         self.setPromiscuousOn()
+        self.startSniffing(snifferSocket)
 
+    def startSniffing(self, snifferSocket):
         while True:
-            print(snifferSocket.recvfrom(65565))
+            receivedPacket = snifferSocket.recvfrom(65565)
+            print("Received packet: " + str(receivedPacket))
+
+            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket)
+            print("Protocol: %s, Src: %s, Dst: %s" % (str(ipHeader.protocol), str(ipHeader.sourceAddress), str(ipHeader.destinationAddress)))
 
     def setPromiscuousOn(self):
         self.setPromiscuousMode("on")
@@ -43,10 +49,6 @@ class Snibber:
             # socketProtocol = socket.IPPROTO_ICMP
         self.socketProtocol = socketProtocol
         return socketProtocol
-
-    def startSniffing(self):
-        print()
-
 
 snibber = Snibber()
 
