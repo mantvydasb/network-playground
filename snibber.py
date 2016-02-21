@@ -38,7 +38,8 @@ class snibber:
         if self.isThiswindows():
             socketProtocol = socket.IPPROTO_IP
         else:
-            socketProtocol = socket.IPPROTO_ICMP
+            socketProtocol = socket.IPPROTO_TCP
+            # socketProtocol = socket.IPPROTO_ICMP
         self.socketProtocol = socketProtocol
         return socketProtocol
 
