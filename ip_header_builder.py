@@ -17,10 +17,10 @@ class IPHeaderBuilder(Structure):
         ("dst", c_ulong),
     ]
 
-    def __init__(self, socketBuffer):
-        self.protocolMap = {1: "ICMP", 6: "TCP", 17: "UDP"}
-        self.sourceAddress = socket.inet_ntoa(struct.pack("<L", self.src))
-        self.destinationAddress = socket.inet_ntoa(struct.pack("<L", self.dst))
-        self.protocol = socket.inet_ntoa(struct.pack("<L", self.protocol_num))
-        # self.protocol = self.protocolMap[self.protocol_num]
-        # return self
+    def __init__(self, packedBytes):
+        protocolMap = {1: "ICMP", 6: "TCP", 17: "UDP"}
+        ipHeader = struct.unpack('BBHHHBBH4s4s', packedBytes)
+        # ipHeader = (69, 32, 39169, 43119, 64, 114, 6, 40788, '(qW\xdc', '\xc0\xa8\x02\x02')
+        self.sourceAddress = socket.inet_ntoa(ipHeader[8])
+        self.destinationAddress = socket.inet_ntoa(ipHeader[9])
+        self.protocol = protocolMap[ipHeader[6]]
