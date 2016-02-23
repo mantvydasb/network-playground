@@ -35,7 +35,7 @@ class Snibber:
 
     def startListening(self):
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, self.getSocketProtocol())
-        sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+        # sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
         sniffer.bind((self.host, 0))
         print("[ # ] Snibber bound to %s" % self.host)
         return sniffer
@@ -46,7 +46,6 @@ class Snibber:
             socketProtocol = socket.IPPROTO_IP
         else:
             socketProtocol = socket.IPPROTO_TCP
-            # socketProtocol = socket.IPPROTO_ICMP
         self.socketProtocol = socketProtocol
         return socketProtocol
 

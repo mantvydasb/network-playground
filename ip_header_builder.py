@@ -2,28 +2,13 @@ from ctypes import *
 import struct
 import socket
 
-class IPHeaderBuilder(Structure):
-    _fields_ = [
-        ("ihl", c_ubyte, 4),
-        ("version", c_ubyte, 4),
-        ("tos", c_ubyte),
-        ("len", c_ushort),
-        ("id", c_ushort),
-        ("offset", c_ushort),
-        ("ttl", c_ubyte),
-        ("protocol_num", c_byte),
-        ("sum", c_ushort),
-        ("src", c_ulong),
-        ("dst", c_ulong),
-    ]
-
+class IPHeaderBuilder():
     def __init__(self, packedBytes):
         protocolMap = {1: "ICMP", 6: "TCP", 17: "UDP"}
         ipHeader = struct.unpack('<bbHHHBBH4s4s', packedBytes)
         print("IP header:" + str(ipHeader))
         # ipHeader = struct.unpack('BBHHHBBH4s4s', packedBytes)
-                                  # 2+6+2+2+4+4
-        # ipHeader = (69, 32, 39169, 43119, 64, 114, 6, 40788, '(qW\xdc', '\xc0\xa8\x02\x02')
+        # ipHeader = (b69, b32, h39169, h43119, h64, b114, b6, h40788, '4s(qW\xdc', 4s'\xc0\xa8\x02\x02')
 
         self.protocol = protocolMap[ipHeader[6]]
         self.sourceAddress = socket.inet_ntoa(ipHeader[8])
