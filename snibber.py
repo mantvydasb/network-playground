@@ -41,13 +41,12 @@ class Snibber:
         return sniffer
 
     def getSocketProtocol(self):
-        socketProtocol = ""
         if self.isThiswindows():
-            socketProtocol = socket.IPPROTO_IP
+            self.socketProtocol = socket.IPPROTO_IP
         else:
-            socketProtocol = socket.IPPROTO_ICMP
-        self.socketProtocol = socketProtocol
-        return socketProtocol
+            self.socketProtocol = socket.IPPROTO_ICMP
+
+        return self.socketProtocol
 
 snibber = Snibber()
 
