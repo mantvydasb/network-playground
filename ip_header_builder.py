@@ -11,14 +11,14 @@ class IPHeaderBuilder():
         protocolMap = {1: "ICMP", 6: "TCP", 17: "UDP"}
 
         if headerType == HEADER_TCP:
-            ipHeader = struct.unpack('<bbHHHBBH4s4s', packedBytes[0:20])
+            IPheader = struct.unpack('<bbHHHBBH4s4s', packedBytes[0:20])
 
-            self.protocol = protocolMap[ipHeader[6]]
-            self.sourceAddress = socket.inet_ntoa(ipHeader[8])
-            self.destinationAddress = socket.inet_ntoa(ipHeader[9])
+            self.protocol = protocolMap[IPheader[6]]
+            self.sourceAddress = socket.inet_ntoa(IPheader[8])
+            self.destinationAddress = socket.inet_ntoa(IPheader[9])
             self.data = ''
 
-            versionIhl = ipHeader[0]
+            versionIhl = IPheader[0]
             version = versionIhl >> 4
             internetHeaderLength = versionIhl & 0xF
             IPheaderLength = internetHeaderLength * 4
@@ -38,5 +38,7 @@ class IPHeaderBuilder():
             self.data = str(packedBytes[dataOffset:]).rstrip()
 
         elif headerType == HEADER_ICMP:
-            print('ew')
+            print("Packet bytes: %s" % str(packedBytes))
+            # ICMPheader = struct.unpack("<B", packedBytes[0:7])
+            # print("Type: %s" % str(ICMPheader))
 

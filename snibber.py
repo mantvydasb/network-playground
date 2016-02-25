@@ -4,10 +4,9 @@ import subprocess
 import ip_header_builder
 
 PROMISCUOUS_MODE = "ip link set enp0s31f6 promisc "
+HOST = "192.168.2.2"
 
 class Snibber:
-    host = "192.168.2.2"
-
     def __init__(self):
         snifferSocket = self.startListening()
         self.setPromiscuousOn()
@@ -16,8 +15,10 @@ class Snibber:
     def startSniffing(self, snifferSocket):
         while True:
             receivedPacket = snifferSocket.recvfrom(65565)
-            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket[0], ip_header_builder.HEADER_TCP)
-            if ipHeader.data:
+            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_ICMP)
+            # ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket[0], ip_header_builder.HEADER_ICMP)
+
+            if not ipHeader and ipHeader.data:
                 print('\n\n\n############################################################')
                 print("%s: %s:%s ===> %s:%s\nData: %s" % (str(ipHeader.protocol), str(ipHeader.sourceAddress), str(ipHeader.sourcePort), str(ipHeader.destinationAddress), str(ipHeader.destinationPort), str(ipHeader.data)))
                 print('############################################################')
@@ -36,8 +37,8 @@ class Snibber:
 
     def startListening(self):
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, self.getSocketProtocol())
-        sniffer.bind((self.host, 0))
-        print("[ # ] Snibber bound to %s" % self.host)
+        sniffer.bind((HOST, 0))
+        print("[ # ] Snibber bound to %s" % HOST)
         return sniffer
 
     def getSocketProtocol(self):
