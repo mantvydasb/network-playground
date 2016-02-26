@@ -39,6 +39,6 @@ class IPHeaderBuilder():
 
         elif headerType == HEADER_ICMP:
             print("Packet bytes: %s" % str(packedBytes))
-            # ICMPheader = struct.unpack("<B", packedBytes[0:7])
+            # ICMPheader = struct.unpack("<B", packedgitBytes[0:7])
             # print("Type: %s" % str(ICMPheader))
 

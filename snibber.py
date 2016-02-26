@@ -14,11 +14,10 @@ class Snibber:
 
     def startSniffing(self, snifferSocket):
         while True:
-            receivedPacket = snifferSocket.recvfrom(65565)
-            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_ICMP)
-            # ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket[0], ip_header_builder.HEADER_ICMP)
+            receivedPacket = snifferSocket.recvfrom(65565)[0]
+            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_TCP)
 
-            if not ipHeader and ipHeader.data:
+            if ipHeader.data:
                 print('\n\n\n############################################################')
                 print("%s: %s:%s ===> %s:%s\nData: %s" % (str(ipHeader.protocol), str(ipHeader.sourceAddress), str(ipHeader.sourcePort), str(ipHeader.destinationAddress), str(ipHeader.destinationPort), str(ipHeader.data)))
                 print('############################################################')
@@ -45,7 +44,7 @@ class Snibber:
         if self.isThiswindows():
             self.socketProtocol = socket.IPPROTO_IP
         else:
-            self.socketProtocol = socket.IPPROTO_ICMP
+            self.socketProtocol = socket.IPPROTO_TCP
 
         return self.socketProtocol
 
