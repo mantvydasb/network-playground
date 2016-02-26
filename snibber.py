@@ -14,7 +14,7 @@ class Snibber:
 
     def startSniffing(self, snifferSocket):
         while True:
-            receivedPacket = snifferSocket.recvfrom(65565)[0]
+            receivedPacket = snifferSocket.recvfrom(65535)[0]
             ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_TCP)
 
             if ipHeader.data:
