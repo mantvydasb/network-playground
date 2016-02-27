@@ -1,5 +1,4 @@
 # A simple TCP port scanner to see if it works;
-
 import socket
 import threading
 import sys
@@ -13,11 +12,11 @@ class BortScanner():
 
         for host in hosts:
             self.isHostDown = False
-
             print("\n\nScanning %s for open ports in the %s" % (host, portsRange))
+
             for port in portsRange:
                 if not self.isHostDown:
-                    scanningThread = threading.Thread(target=self.scanPort, args=[host,port])
+                    scanningThread = threading.Thread(target=self.scanPort, args=[host, port])
                     scanningThread.run()
                 else: break
 
@@ -27,7 +26,7 @@ class BortScanner():
         if len(sys.argv) > 1:
             hosts = [sys.argv[1]]
         else:
-            for ip in range(1, 10):
+            for ip in range(1, 255):
                 hosts.append("192.168.2." + str(ip))
         return hosts
 
