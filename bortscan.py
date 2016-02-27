@@ -32,7 +32,7 @@ class BortScanner():
 
     def scanPort(self, host, port):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(2)
+        s.settimeout(.1)
 
         try:
             result = s.connect_ex((host, port))
