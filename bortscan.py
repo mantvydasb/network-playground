@@ -23,6 +23,7 @@ class BortScanner():
 
     def getHostsToScan(self):
         hosts = []
+
         if len(sys.argv) > 1:
             hosts = [sys.argv[1]]
         else:
