@@ -14,8 +14,6 @@ class Snibber:
         self.setPromiscuousOn()
         self.startSniffing(snifferSocket)
 
-        conf.iface = interface
-
     def startSniffing(self, snifferSocket):
         while True:
             receivedPacket = snifferSocket.recvfrom(65535)[0]
