@@ -15,12 +15,13 @@ class Snibber:
     def startSniffing(self, snifferSocket):
         while True:
             receivedPacket = snifferSocket.recvfrom(65535)[0]
-            ipHeader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_TCP)
+            IPheader = ip_header_builder.IPHeaderBuilder(receivedPacket, ip_header_builder.HEADER_TCP)
 
-            if ipHeader.data:
+            if IPheader.data:
                 print('\n\n\n############################################################')
-                print("%s: %s:%s ===> %s:%s\nData: %s" % (str(ipHeader.protocol), str(ipHeader.sourceAddress), str(ipHeader.sourcePort), str(ipHeader.destinationAddress), str(ipHeader.destinationPort), str(ipHeader.data)))
+                print("%s: %s:%s ===> %s:%s\nData: %s" % (str(IPheader.protocol), str(IPheader.sourceAddress), str(IPheader.sourcePort), str(IPheader.destinationAddress), str(IPheader.destinationPort), str(IPheader.data)))
                 print('############################################################')
+                self.isFTPlogin(IPheader)
 
     def setPromiscuousOn(self):
         self.setPromiscuousMode("on")
@@ -47,6 +48,12 @@ class Snibber:
             self.socketProtocol = socket.IPPROTO_TCP
 
         return self.socketProtocol
+
+    def isFTPlogin(self, IPheader):
+        packetData = IPheader.data.lower()
+        if IPheader.destinationPort is 21 or IPheader.sourcePort is 21:
+            if packetData.find("user") or packetData.find("pass"):
+                print("We have an attempt to login to FTP!\n" + IPheader.data)
 
 snibber = Snibber()
 
