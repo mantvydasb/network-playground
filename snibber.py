@@ -2,15 +2,19 @@ import socket
 import os
 import subprocess
 import ip_header_builder
+from scapy.all import *
 
 PROMISCUOUS_MODE = "ip link set enp0s31f6 promisc "
 HOST = "192.168.2.2"
+MAC_ADDRESS_REGEXP = '(([0-9a-zA-Z]+):){5}[0-9a-zA-Z]+'
 
 class Snibber:
     def __init__(self):
         snifferSocket = self.startListening()
         self.setPromiscuousOn()
         self.startSniffing(snifferSocket)
+
+        conf.iface = interface
 
     def startSniffing(self, snifferSocket):
         while True:
