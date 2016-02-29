@@ -8,7 +8,9 @@ PROMISCUOUS_MODE = "ip link set enp0s31f6 promisc "
 HOST = "192.168.2.2"
 MAC_ADDRESS_REGEXP = '(([0-9a-zA-Z]+):){5}[0-9a-zA-Z]+'
 
+
 class Snibber:
+
     def __init__(self):
         snifferSocket = self.startListening()
         self.setPromiscuousOn()
@@ -54,7 +56,7 @@ class Snibber:
     def isFTPlogin(self, IPheader):
         packetData = IPheader.data.lower()
         if IPheader.destinationPort is 21 or IPheader.sourcePort is 21:
-            if packetData.find("user") or packetData.find("pass"):
+            if packetData.find("user") > -1 or packetData.find("pass") > -1:
                 print("We have an attempt to login to FTP!\n" + IPheader.data)
 
 snibber = Snibber()
