@@ -1,6 +1,7 @@
 from scapy.all import *
 
-TARGET_IP = "192.168.2.6"
+
+TARGET_IP = "192.168.2.3"
 GATEWAY_IP = "192.168.2.1"
 
 # Playing with an IP packet
@@ -14,8 +15,7 @@ print(a)
 b = TCP()
 print(b)
 
-
-
+# pienas = Field("pienas", "192.168.2.8","<H")
 
 
 #####  Playing with ARPs - poisoning target machine and its gateway #####
