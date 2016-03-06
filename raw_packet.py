@@ -36,7 +36,7 @@ DESTINATION_PORT    = 5555
 SOURCE_PORT         = 55555
 SEQUENCE_NUMBER     = 55
 ACKNOWLDGEMENT_NUM  = 66
-TCP_OFFSET = (5 << 4) + 0
+TCP_OFFSET = 5 << 4
 TCP_FIN = 0
 TCP_SYN = 1
 TCP_RST = 0
@@ -74,7 +74,7 @@ packet = [
     struct.pack("!H", DESTINATION_PORT),
     struct.pack("!L", SEQUENCE_NUMBER),
     struct.pack("!L", ACKNOWLDGEMENT_NUM),
-    struct.pack("!B", TCP_OFFSET), #offset
+    struct.pack("!B", TCP_OFFSET),
     struct.pack("!B", TCP_FLAGS),
     struct.pack("!H", WINDOW),
     struct.pack("!H", TCP_HEADER_CHECKSUM),
