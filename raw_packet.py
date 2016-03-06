@@ -7,7 +7,7 @@ NETWORK_INTERFACE   = 'enp0s31f6'
 # Ethernet header
 SOURCE_IP           = "192.168.2.2"
 DESTINATION_IP      = "192.168.2.1"
-SOURCE_MAC          = [0x30, 0x5a, 0x3a, 0x57, 0xc0, 0x2e]
+SOURCE_MAC          = 0x30, 0x5a, 0x3a, 0x57, 0xc0, 0x2e
 DESTINATION_MAC     = "00:1c:df:c1:bd:91"
 BROADCAST_MAC       = [0xFF]*6
 HARDWARE_SIZE       = 0x0006
@@ -23,7 +23,7 @@ IP_VERSION_AND_HL   = 0x45
 SERVICE             = 0
 TOTAL_LENGTH        = (IP_VERSION_AND_HL >> 4) * 5
 IDENTIFICATION      = 0
-FRAGMENT_OFFSET     = 0
+FRAGMENT_OFFSET     = 0x4000  #also sets the "do not fragment packet flag
 TIME_TO_LIVE        = 64
 PROTOCOL_TCP        = 6
 HEADER_CHECKSUM     = 0, 0
@@ -32,12 +32,12 @@ connection = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
 connection.bind((('%s' % NETWORK_INTERFACE), socket.SOCK_RAW))
 
 packet = [
-    # Frame header
+    # Frame datagram
     struct.pack("!6B", *BROADCAST_MAC),
     struct.pack("!6B", *SOURCE_MAC),
     struct.pack("!H", TYPE_IP),
 
-    # IP header
+    # IP datagram
     struct.pack("!B", IP_VERSION_AND_HL),
     struct.pack("!B", SERVICE),
     struct.pack("!H", TOTAL_LENGTH),
@@ -48,6 +48,9 @@ packet = [
     struct.pack("!BB", *HEADER_CHECKSUM),
     socket.inet_aton(SOURCE_IP),
     socket.inet_aton(DESTINATION_IP),
+
+    # TCP datagram
+    # struct.pack("!BB", *HEADER_CHECKSUM),
 ]
 
 while 1:
