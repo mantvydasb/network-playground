@@ -23,7 +23,7 @@ def printOutUrls():
 
         if len(url) >= 2:
             url = url[1]
-            if "http" in url or "https" in url:
+            if url.__contains__("http"):
                 print(url)
 
 getSearchResults()
