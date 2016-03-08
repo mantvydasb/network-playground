@@ -85,7 +85,6 @@ packet = [
 counter = 0
 while 1:
     print("Sending packet %s %s" % (str(counter), str(packet)))
-    data = b'hello world'
     connection.send(b''.join(packet))
     time.sleep(.1)
     counter += 1
