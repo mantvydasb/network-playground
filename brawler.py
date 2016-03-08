@@ -2,7 +2,7 @@ import urllib3
 import re
 
 BASE_URL = "http://www.google.co.uk/search?num=500&q="
-QUERY = "%laura.klimaviciute@gmail.com%22"
+QUERY = "%contactus@ratesetter.com%22"
 SEARCH_URL = BASE_URL + QUERY
 URL_PATTERN = '(href[":\/\+?_a-zA-Z=&0-9%.-]+)'
 RESULTS_PER_PAGE = 1000
