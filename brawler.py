@@ -11,7 +11,7 @@ HEADERS['User-Agent'] = 'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537
 URL_REGEX = re.compile(URL_PATTERN)
 POOL_MANAGER = urllib3.PoolManager()
 
-def getRequestData():
+def getSearchResults():
     global request, response
     request = POOL_MANAGER.request('GET', SEARCH_URL, headers=HEADERS)
     response = request.data
@@ -26,5 +26,5 @@ def printOutUrls():
             if "http" in url or "https" in url:
                 print(url)
 
-getRequestData()
+getSearchResults()
 printOutUrls()
