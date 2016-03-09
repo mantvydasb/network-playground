@@ -1,30 +1,72 @@
+import time
 import urllib3
+import sys
 import re
+import threading
 
-BASE_URL = "http://www.google.co.uk/search?num=500&q="
-QUERY = "%contactus@ratesetter.com%22"
-SEARCH_URL = BASE_URL + QUERY
-URL_PATTERN = '(href[":\/\+?_a-zA-Z=&0-9%.-]+)'
-RESULTS_PER_PAGE = 1000
-HEADERS = {}
-HEADERS['User-Agent'] = 'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.75 Safari/537.36'
-URL_REGEX = re.compile(URL_PATTERN)
-POOL_MANAGER = urllib3.PoolManager()
+class LeftoversHunter():
+    poolManager = urllib3.PoolManager()
+    def __init__(self):
+        query = sys.argv[1]
+        print("Googling... " + query)
+        searchResults = self.getSearchResults(query.replace(" ", "%20"))
+        urls = self.extractUrlsFromBody(searchResults)
+        self.startCrawling(urls)
 
-def getSearchResults():
-    global request, response
-    request = POOL_MANAGER.request('GET', SEARCH_URL, headers=HEADERS)
-    response = request.data
+    def startCrawling(self, urls):
+        extractedUrls = []
 
-def printOutUrls():
-    urlsList = URL_REGEX.findall(response)
-    for url in urlsList:
-        url = url.split('"')
+        for url in urls:
+            time.sleep(2)
+            htmlBody = self.retrieveHtmlBody(url)
+            extractedUrls += self.extractUrlsFromBody(htmlBody)
+            self.hasAnythingInteresting(htmlBody)
+            # print("Extracted urls:" + str(extractedUrls))
 
-        if len(url) >= 2:
-            url = url[1]
-            if url.__contains__("http"):
-                print(url)
+        crawlingThread = threading.Thread(target=self.startCrawling, args=[extractedUrls])
+        crawlingThread.start()
 
-getSearchResults()
-printOutUrls()
+    def hasAnythingInteresting(self, htmlBody):
+        emailPattern = '([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z0-9.-]+)'
+        regexp = re.compile(emailPattern)
+        emailsList = regexp.findall(htmlBody)
+
+        if emailsList:
+            print("******************************************")
+            print(emailsList)
+            print("******************************************")
+
+    def getSearchResults(self, searchQuery):
+        baseUrl = "http://www.google.com/search?num=100&q="
+        maxResults = 1000
+        searchUrl = baseUrl + searchQuery
+        return self.retrieveHtmlBody(searchUrl)
+
+    def retrieveHtmlBody(self, url):
+        htmlBody = self.poolManager.request('GET', url)
+        print("\n")
+        print("[ > ] Crawling " + url)
+        return htmlBody.data
+
+    def extractUrlsFromBody(self, htmlBody):
+        urlPattern = '(href[":\/\+?_a-zA-Z=&0-9%.-]+)'
+        regexp = re.compile(urlPattern)
+        rawUrlsList = regexp.findall(htmlBody)
+        urls = []
+
+        for url in rawUrlsList:
+            url = url.split('"')
+
+            if len(url) >= 2:
+                url = url[1].replace("/url?q=", "")
+                if url.__contains__("http") \
+                        and not url.__contains__("google") \
+                        and not url.__contains__("https") \
+                        and not url.__contains__("webmention") \
+                        and not url.__contains__("mozilla.org") \
+                        and not url.__contains__("facebook") \
+                        and not url.__contains__("blogger"):
+                    urls.append(url)
+        return urls
+
+LeftoversHunter()
