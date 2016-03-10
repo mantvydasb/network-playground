@@ -4,8 +4,9 @@ import sys
 import re
 import threading
 
-class LeftoversHunter():
+class Barvester():
     poolManager = urllib3.PoolManager()
+
     def __init__(self):
         query = sys.argv[1]
         print("Googling... " + query)
@@ -21,7 +22,6 @@ class LeftoversHunter():
             htmlBody = self.retrieveHtmlBody(url)
             extractedUrls += self.extractUrlsFromBody(htmlBody)
             self.hasAnythingInteresting(htmlBody)
-            # print("Extracted urls:" + str(extractedUrls))
 
         crawlingThread = threading.Thread(target=self.startCrawling, args=[extractedUrls])
         crawlingThread.start()
@@ -32,9 +32,7 @@ class LeftoversHunter():
         emailsList = regexp.findall(htmlBody)
 
         if emailsList:
-            print("******************************************")
             print(emailsList)
-            print("******************************************")
 
     def getSearchResults(self, searchQuery):
         baseUrl = "http://www.google.com/search?num=100&q="
@@ -69,4 +67,4 @@ class LeftoversHunter():
                     urls.append(url)
         return urls
 
-LeftoversHunter()
+Barvester()
