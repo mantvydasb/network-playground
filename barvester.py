@@ -4,7 +4,9 @@ import sys
 import re
 import threading
 
+
 class Barvester():
+
     poolManager = urllib3.PoolManager()
 
     def __init__(self):
@@ -44,8 +46,7 @@ class Barvester():
         headers = {}
         headers['User-Agent'] = "Googlebot"
         htmlBody = self.poolManager.request('GET', url, headers=headers)
-        print("\n")
-        print("[ > ] Crawling " + url)
+        print("[>] Crawling " + url)
         return htmlBody.data
 
     def extractUrlsFromBody(self, htmlBody):
