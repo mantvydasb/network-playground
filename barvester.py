@@ -41,7 +41,9 @@ class Barvester():
         return self.retrieveHtmlBody(searchUrl)
 
     def retrieveHtmlBody(self, url):
-        htmlBody = self.poolManager.request('GET', url)
+        headers = {}
+        headers['User-Agent'] = "Googlebot"
+        htmlBody = self.poolManager.request('GET', url, headers=headers)
         print("\n")
         print("[ > ] Crawling " + url)
         return htmlBody.data
