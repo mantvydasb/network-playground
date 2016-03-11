@@ -37,8 +37,7 @@ class Barvester():
             print(emailsList)
 
     def getSearchResults(self, searchQuery):
-        baseUrl = "http://www.google.com/search?num=100&q="
-        maxResults = 1000
+        baseUrl = "http://www.google.com/search?num=1000&q="
         searchUrl = baseUrl + searchQuery
         return self.retrieveHtmlBody(searchUrl)
 
