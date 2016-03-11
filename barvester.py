@@ -29,7 +29,7 @@ class Barvester():
         crawlingThread.start()
 
     def hasAnythingInteresting(self, htmlBody):
-        emailPattern = '([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z0-9.-]+)'
+        emailPattern = '([a-zA-Z0-9.]+@[a-zA-Z0-9].\B.[a-zA-Z0-9.]+)'
         regexp = re.compile(emailPattern)
         emailsList = regexp.findall(htmlBody)
 
