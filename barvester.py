@@ -20,13 +20,14 @@ class Barvester():
         extractedUrls = []
 
         for url in urls:
-            time.sleep(.2)
             htmlBody = self.retrieveHtmlBody(url)
             extractedUrls += self.extractUrlsFromBody(htmlBody)
             self.hasAnythingInteresting(htmlBody)
+        self.startCrawling(extractedUrls)
 
-        crawlingThread = threading.Thread(target=self.startCrawling, args=[extractedUrls])
-        crawlingThread.start()
+    def threadedCrawling(self, urls):
+        t = threading.Thread(target=self.startCrawling, args=[urls])
+        t.start()
 
     def hasAnythingInteresting(self, htmlBody):
         emailPattern = '([a-zA-Z0-9.]+@[a-zA-Z0-9].\B.[a-zA-Z0-9.]+)'
@@ -44,9 +45,17 @@ class Barvester():
     def retrieveHtmlBody(self, url):
         headers = {}
         headers['User-Agent'] = "Googlebot"
-        htmlBody = self.poolManager.request('GET', url, headers=headers)
+
+        try:
+            response = self.poolManager.request('GET', url, headers=headers)
+            htmlBody = response.data
+        except:
+            print("%s down" % url)
+            htmlBody = "Website down"
+            pass
         print("[>] Crawling " + url)
-        return htmlBody.data
+
+        return htmlBody
 
     def extractUrlsFromBody(self, htmlBody):
         urlPattern = '(href[":\/\+?_a-zA-Z=&0-9%.-]+)'
