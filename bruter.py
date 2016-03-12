@@ -12,7 +12,7 @@ class Bruter:
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
     def __init__(self):
-        print("[!] Starting brutal force on ")
+        print("[!] Starting brutal force on %s" % self.postUrl)
         for password in self.passwords:
             time.sleep(1)
             threading.Thread(target=self.attemptLogin, args=[password]).start()
