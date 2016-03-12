@@ -20,7 +20,7 @@ class Barvester():
         extractedUrls = []
 
         for url in urls:
-            time.sleep(2)
+            time.sleep(.2)
             htmlBody = self.retrieveHtmlBody(url)
             extractedUrls += self.extractUrlsFromBody(htmlBody)
             self.hasAnythingInteresting(htmlBody)
@@ -34,7 +34,7 @@ class Barvester():
         emailsList = regexp.findall(htmlBody)
 
         if emailsList:
-            print(emailsList)
+            print("[<<] Goodies: " + str(emailsList))
 
     def getSearchResults(self, searchQuery):
         baseUrl = "http://www.google.com/search?num=1000&q="
