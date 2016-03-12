@@ -15,9 +15,9 @@ class Bruter:
         print("[!] Starting brutal force on ")
         for password in self.passwords:
             time.sleep(1)
-            threading.Thread(target=self.brute, args=[password]).start()
+            threading.Thread(target=self.attemptLogin, args=[password]).start()
 
-    def brute(self, password):
+    def attemptLogin(self, password):
         print("[>] Trying %s" % password)
         try:
             parameters = parse.urlencode({"pws": password}).encode("utf8")
