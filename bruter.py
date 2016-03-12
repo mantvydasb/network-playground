@@ -1,5 +1,5 @@
 import urllib3
-import urllib.parse
+from urllib import parse, request
 
 class Bruter:
 
@@ -8,12 +8,13 @@ class Bruter:
     passwordField = "pma_password"
     usernameValue = "msfadmin"
     passwordValue = "msfadmin"
-    poolManager = urllib3.PoolManager()
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    parameters = parse.urlencode({usernameField: usernameValue, passwordField: passwordValue}).encode("utf8")
 
     def __init__(self):
         print("Starting..")
-        fields = { self.usernameField: self.usernameValue, self.passwordField: self.passwordValue}
-        req = self.poolManager.request("POST", self.postUrl, fields=fields, headers={'Content-type': 'application/x-www-form-urlencoded'})
-        print(req)
+        _request = request.Request(self.postUrl, data=self.parameters, headers=self.headers, method="POST")
+        response = request.urlopen(_request)
+        print(_request)
 
 Bruter()
