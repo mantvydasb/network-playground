@@ -25,14 +25,13 @@ class GitHubSession():
         pienas = self.repository.get_contents(pathToFile)
         print(pienas)
 
-
     def getConfig(self, id):
         self.getFileContents()
 
 
 class Brojan():
     id = "1"
-    configPath = "configs/" + id + ".json"
+    configPath = "brojan/configs/" + id + ".json"
     intelligenceStoragePath = "data/%s/" % id
     modules = []
     configured = False
