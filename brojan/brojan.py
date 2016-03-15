@@ -24,9 +24,6 @@ class GitHubSession():
         content = self.repository.get_contents(pathToFile)
         return content
 
-    def getConfig(self, id):
-        self.getFileContents()
-
 
 class Brojan():
     id = "1"
