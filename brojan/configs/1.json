@@ -1,5 +1,3 @@
-[
-  {
-    "module": "uptime"
-  }
-]
+{
+  "modules": ["uptime", "pienas"]
+}
