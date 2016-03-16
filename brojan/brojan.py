@@ -11,14 +11,12 @@ from github import Github
 
 
 class GitHubSession():
-    username = "mantvydo@gmail.com"
     username = "mantvydasb"
-    session = ''
 
     def __init__(self, username=username):
         password = input("Github password: ")
-        self.session = Github(username, password)
-        self.repository = self.session.get_repo(self.username + "/network-playground")
+        session = Github(username, password)
+        self.repository = session.get_repo(self.username + "/network-playground")
         self.branch = self.repository.get_branch("master")
 
     def getFileContents(self, pathToFile):
@@ -41,8 +39,8 @@ class Brojan():
         modules = self.loadModules(config)
         self.executeModules(modules)
 
-    def uploadIntelligence(self):
-        print("todo")
+    def uploadIntelligence(self, intelligenceData):
+        p = self.github.repository.create_git_blob("pienas", encoding="utf8")
 
     def executeModules(self, modules):
         for module in modules:
