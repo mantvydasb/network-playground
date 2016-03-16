@@ -55,7 +55,6 @@ class Brojan():
                 print("Loading module '%s' " % module)
                 newModule = importlib.import_module('modules.%s' % module)
                 sys.modules[module] = newModule
-                print(sys.modules)
 
         self.configured =  True
 
