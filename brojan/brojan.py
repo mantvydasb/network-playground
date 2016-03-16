@@ -7,7 +7,7 @@ import importlib
 import threading
 import queue
 import os
-from github import *
+from github import Github
 
 
 class GitHubSession():
