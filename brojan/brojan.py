@@ -41,6 +41,9 @@ class Brojan():
         modules = self.loadModules(config)
         self.executeModules(modules)
 
+    def uploadIntelligence(self):
+        print("todo")
+
     def executeModules(self, modules):
         for module in modules:
             print(module.execute())
