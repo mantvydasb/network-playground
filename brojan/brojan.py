@@ -37,7 +37,7 @@ class Brojan():
     def __init__(self):
         self.github = GitHubSession()
         config = self.getConfig()
-        self.processTasks(config)
+        self.loadModules(config)
 
     def getConfig(self):
         config = self.getFileContents(self.configPath)
@@ -48,10 +48,11 @@ class Brojan():
     def getFileContents(self, filePath):
         return self.github.getFileContents(filePath)
 
-    def processTasks(self, config):
-        for module in config:
-            if module['module'] not in sys.modules:
-                print("")
+    def loadModules(self, config):
+        for module in config.modules:
+            if module not in sys.modules:
+                print("Loading module " + module)
+                exec(module)
 
         self.configured =  True
 
