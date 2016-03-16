@@ -32,10 +32,16 @@ class Brojan():
     modules = []
     configured = False
     tasksQueue = queue.Queue()
+    github = ''
 
     def __init__(self):
-        github = GitHubSession()
-        github.getFileContents(self.configPath)
+        self.github = GitHubSession()
+        config = self.getConfig()
 
+    def getConfig(self):
+        return self.getFileContents(self.configPath)
+
+    def getFileContents(self, filePath):
+        return self.github.getFileContents(filePath)
 
 Brojan()
