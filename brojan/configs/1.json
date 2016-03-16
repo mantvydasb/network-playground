@@ -1,3 +1,5 @@
 {
-  "modules": ["uptime", "pienas"]
+  "version": 0.1,
+  "modules": ["uptime", "pienas"],
+  "activeFrom": ["uptime", "pienas"]
 }
