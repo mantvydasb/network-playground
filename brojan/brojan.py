@@ -38,7 +38,12 @@ class Brojan():
     def __init__(self):
         self.github = GitHubSession()
         config = self.getConfig()
-        self.loadModules(config)
+        modules = self.loadModules(config)
+        self.executeModules(modules)
+
+    def executeModules(self, modules):
+        for module in modules:
+            print(module.execute())
 
     def getConfig(self):
         config = self.getFileContents(self.configPath)
@@ -50,12 +55,12 @@ class Brojan():
         return self.github.getFileContents(filePath)
 
     def loadModules(self, config):
+        modules = []
         for module in config['modules']:
-            if module not in sys.modules:
-                print("Loading module '%s' " % module)
-                newModule = importlib.import_module('modules.%s' % module)
-                sys.modules[module] = newModule
-
+            print("Loading module '%s' " % module)
+            newModule = importlib.import_module('modules.%s' % module)
+            modules.append(newModule)
+            return modules
         self.configured =  True
 
 Brojan()

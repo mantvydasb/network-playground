@@ -1,4 +1,4 @@
 import subprocess
 
-def run(**kwargs):
+def execute(**kwargs):
     return subprocess.check_output("uptime", shell=True).decode("utf8")
