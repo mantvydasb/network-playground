@@ -1,4 +1,3 @@
-import urllib3
 from urllib import parse, request, error
 import time
 import threading
@@ -16,7 +15,7 @@ class Bruter:
     usernameField = ''
     parameters = {}
 
-    def __init__(self, loginUrl=None, usernameField=None, passwordField=None, parameters={}):
+    def __init__(self, loginUrl=None, usernameField=None, passwordField=None, parameters={}, headers={}):
         if loginUrl:
            self.loginUrl = loginUrl
         else:
@@ -27,6 +26,9 @@ class Bruter:
             self.passwordField = passwordField
         if usernameField:
             self.usernameField = usernameField
+        if headers:
+            self.headers.update(headers)
+
 
     def startBruteforce(self):
         print("[!] Starting brutal force on %s" % self.loginUrl)
@@ -40,9 +42,11 @@ class Bruter:
         if password:
             self.parameters[self.passwordField] = password
 
-        parameters = parse.urlencode(self.parameters).encode("utf8")
-        request_ = request.Request(self.loginUrl, data=parameters, headers=self.headers, method="POST")
+        request_ = self.buildRequest(self.loginUrl, method="POST")
+        response = self.sendRequest(request_)
+        print("..and we're in.. \n " + response)
 
+    def sendRequest(self, request_):
         try:
             print("[>] Trying %s" % self.parameters)
             response = request.urlopen(request_)
@@ -51,13 +55,22 @@ class Bruter:
         except error.HTTPError as e:
             print(str(e.code))
             pass
+        response = response.decode("utf8")
+        return response
 
-        print("..and we're in.. \n " + response.decode("utf8"))
+    def buildRequest(self, url, headers={}, method="GET"):
+        if headers:
+            self.headers.update(headers)
+        parameters = parse.urlencode(self.parameters).encode("utf8")
+        request_ = request.Request(url, data=parameters, headers=self.headers, method=method)
+        return request_
 
+    def getUrlContent(self, url, headers={}):
+        request_ = self.buildRequest(url, headers)
+        response = self.sendRequest(request_)
+        return response
 
 if __name__ == '__main__':
     passwordField = "pws"
     bruter = Bruter(passwordField=passwordField)
     bruter.startBruteforce()
-    # bruter = Bruter(passwordField=passwordField, parameters={passwordField: 'pienukas'})
-    # bruter.attemptLogin(password="penukas")
