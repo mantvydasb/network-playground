@@ -1,8 +1,19 @@
 import bruter
-import xml.etree
+import xml.etree.ElementTree as xmlTree
 from urllib import request
 
+class Torrent:
+    title = ''
+    description = ''
+    link = ''
+
+    def __init__(self, title, description, link):
+        self.title = title
+        self.description = description
+        self.link = link
+
 class MovieSuggestor():
+
 
     linkomaniaCookie = "PHPSESSID=d44a3mfqe1udekmfi54cb0p2h7;"
     linkomania = ''
@@ -20,8 +31,26 @@ class MovieSuggestor():
             headers={"Cookie": self.linkomaniaCookie}
         )
 
+    def login(self):
         response = self.linkomania.attemptLogin(username=self.username, password=self.password)
-        # print(response)
+        return response
+
+    def parseXMLfromString(self, string):
+        root = xmlTree.fromstring(string)
+        return root
+
+    def parseTorrents(self, root):
+        torrents = []
+
+        for child in root[0]:
+            if child.tag == "item":
+                title = str(child.find("title").text).replace(" ", ".")
+                description = child.find("description").text
+                link = child.find("link").text
+                torrent = Torrent(title, description, link)
+                torrents.append(torrent)
+
+        return torrents
 
     def sendRequest(self, url):
         response = self.linkomania.getUrlContent(url, self.linkomania.headers)
@@ -31,5 +60,13 @@ class MovieSuggestor():
         return self.sendRequest(self.latestMovies)
 
 movieSuggestor = MovieSuggestor()
+movieSuggestor.login()
+
 recentMovies = movieSuggestor.getRecentlyUploadedMovies()
-print(str(recentMovies))
+torrenstFeed = movieSuggestor.parseXMLfromString(recentMovies)
+torrents = movieSuggestor.parseTorrents(torrenstFeed)
+
+for torrent in torrents:
+    print(torrent.title)
+
+# print(str(recentMovies))
