@@ -1,18 +1,22 @@
 import bruter
 import xml.etree.ElementTree as xmlTree
+import re
 from urllib import request
 
 class Torrent:
     title = ''
     description = ''
     link = ''
+    uploadDate = ''
 
-    def __init__(self, title, description, link):
+    def __init__(self, title, description, link, uploadDate):
         self.title = title
         self.description = description
         self.link = link
+        self.uploadDate = uploadDate
 
 class MovieSuggestor():
+
 
 
     linkomaniaCookie = "PHPSESSID=d44a3mfqe1udekmfi54cb0p2h7;"
@@ -21,7 +25,7 @@ class MovieSuggestor():
     baseUrl = "https://www.linkomanija.net/"
     loginUrl = baseUrl + "takelogin.php"
     searchUrl = baseUrl + "browse.php?incldead=0&search="
-    latestMovies = baseUrl + "rss.php?feed=link&cat[]=29&cat[]=52&cat[]=53&cat[]=61&passkey=14aba47f3165387ebaaf0aba38c140c2"
+    latestMovieFeed = baseUrl + "rss.php?feed=link&cat[]=29&cat[]=52&cat[]=53&cat[]=61&passkey=14aba47f3165387ebaaf0aba38c140c2"
 
     def __init__(self):
         self.linkomania = bruter.Bruter(
@@ -47,7 +51,8 @@ class MovieSuggestor():
                 title = str(child.find("title").text).replace(" ", ".")
                 description = child.find("description").text
                 link = child.find("link").text
-                torrent = Torrent(title, description, link)
+                uploadDate = child.find("pubDate").text
+                torrent = Torrent(title, description, link, uploadDate)
                 torrents.append(torrent)
 
         return torrents
@@ -56,17 +61,22 @@ class MovieSuggestor():
         response = self.linkomania.getUrlContent(url, self.linkomania.headers)
         return response
 
-    def getRecentlyUploadedMovies(self):
-        return self.sendRequest(self.latestMovies)
+    def getDecentlyRatedMovies(self, torrents):
+      for torrent in torrents:
+            isDecentlyRated = re.search('(<b>Rating:<\/b> [6-9.]+\w)', torrent.description)
+            if isDecentlyRated:
+                rating = isDecentlyRated.group(0).strip("<b>Rating:</b> ")
+                print("[%s imdb] %s " %(rating, torrent.title))
+
+
+    def getLatestMoviesFeed(self):
+        return self.sendRequest(self.latestMovieFeed)
 
 movieSuggestor = MovieSuggestor()
 movieSuggestor.login()
 
-recentMovies = movieSuggestor.getRecentlyUploadedMovies()
+recentMovies = movieSuggestor.getLatestMoviesFeed()
 torrenstFeed = movieSuggestor.parseXMLfromString(recentMovies)
 torrents = movieSuggestor.parseTorrents(torrenstFeed)
+decentlyRatedMovies = movieSuggestor.getDecentlyRatedMovies(torrents)
 
-for torrent in torrents:
-    print(torrent.title)
-
-# print(str(recentMovies))
