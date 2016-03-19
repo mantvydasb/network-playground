@@ -18,7 +18,6 @@ class Torrent:
 class MovieSuggestor():
 
 
-
     linkomaniaCookie = "PHPSESSID=d44a3mfqe1udekmfi54cb0p2h7;"
     linkomania = ''
 
@@ -66,7 +65,7 @@ class MovieSuggestor():
             isDecentlyRated = re.search('(<b>Rating:<\/b> [6-9.]+\w)', torrent.description)
             if isDecentlyRated:
                 rating = isDecentlyRated.group(0).strip("<b>Rating:</b> ")
-                print("[%s imdb] %s " %(rating, torrent.title))
+                print("[%s imdb] %s   [ > ]   %s" %(rating, torrent.title, torrent.link))
 
 
     def getLatestMoviesFeed(self):
