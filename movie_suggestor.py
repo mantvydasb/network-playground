@@ -74,8 +74,8 @@ class MovieSuggestor():
 movieSuggestor = MovieSuggestor()
 movieSuggestor.login()
 
-recentMovies = movieSuggestor.getLatestMoviesFeed()
-torrenstFeed = movieSuggestor.parseXMLfromString(recentMovies)
+recentMoviesFeed = movieSuggestor.getLatestMoviesFeed()
+torrenstFeed = movieSuggestor.parseXMLfromString(recentMoviesFeed)
 torrents = movieSuggestor.parseTorrents(torrenstFeed)
 decentlyRatedMovies = movieSuggestor.getDecentlyRatedMovies(torrents)
 
