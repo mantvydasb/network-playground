@@ -1,7 +1,13 @@
-from Crypto.Util import *
-from Crypto.PublicKey import *
 from Crypto.PublicKey import RSA
 
-publicKey = open("keys/public.crt", 'r')
-publicKey = publicKey.read()
-RSAkey = RSA.importKey(publicKey)
+data = "tis gona beh encrypted message"
+privateKey = RSA.generate(1024)
+publicKey = privateKey.publickey()
+
+print("Encrypting... %s" % data)
+encryptedMessage = publicKey.encrypt(data, 32)
+print(encryptedMessage)
+
+print("Decrypting back..")
+decryptedMessage = privateKey.decrypt(encryptedMessage)
+print(decryptedMessage)
