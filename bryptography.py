@@ -1,13 +1,13 @@
 from Crypto.PublicKey import RSA
 
-data = "tis gona beh encrypted message"
+plainText= "tis gona beh encrypted message"
 privateKey = RSA.generate(1024)
 publicKey = privateKey.publickey()
 
-print("Encrypting... %s" % data)
-encryptedMessage = publicKey.encrypt(data, 32)
-print(encryptedMessage)
+print("Encrypting... %s" % plainText)
+cipherText = publicKey.encrypt(plainText, 32)
+print(cipherText)
 
 print("Decrypting back..")
-decryptedMessage = privateKey.decrypt(encryptedMessage)
-print(decryptedMessage)
+plainText = privateKey.decrypt(cipherText)
+print(plainText)
